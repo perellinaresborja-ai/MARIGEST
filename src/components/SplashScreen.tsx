@@ -34,9 +34,11 @@ export function SplashScreen() {
 
   if (!show) return null;
 
+  const fadeClass = fade ? "opacity-0" : "opacity-100";
+
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-slate-50 transition-opacity duration-500  + (fade ? "opacity-0" : "opacity-100")}
+      className={"fixed inset-0 z-50 flex items-center justify-center bg-slate-50 transition-opacity duration-500 " + fadeClass}
     >
       <div className="flex flex-col items-center gap-6">
         <img 
