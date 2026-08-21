@@ -1,0 +1,307 @@
+// This is your Prisma schema file
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./client-sqlite"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum ClientType {
+  DISTRIBUIDOR
+  HOSTELERIA
+  PARTICULAR
+}
+
+model Client {
+  id              String      @id @default(uuid())
+  commercialName  String
+  legalName       String?
+  cifNif          String?
+  fiscalAddress   String?
+  deliveryAddress String?
+  email           String?
+  billingEmail    String?
+  phone           String?
+  contactPerson   String?
+  type            ClientType
+  
+  agreementId     String?
+  agreement       CommercialAgreement? @relation(fields: [agreementId], references: [id])
+  
+  paymentTermId   String?
+  paymentTerm     PaymentTerm? @relation(fields: [paymentTermId], references: [id])
+  
+  observations    String?
+  
+  orders          Order[]
+  transactions    Transaction[]
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+enum AgreementType {
+  NONE
+  PROMO_X_Y
+  DISCOUNT_PERCENT
+  SPECIAL_PRICE
+  MANUAL
+}
+
+model CommercialAgreement {
+  id          String        @id @default(uuid())
+  name        String
+  type        AgreementType
+  paramX      Int?
+  paramY      Int?
+  paramFloat  Float?        // For percentage or special price
+  clients     Client[]
+}
+
+model PaymentTerm {
+  id          String   @id @default(uuid())
+  name        String
+  days        Int      // 0 for immediate, 30 for 30 days, etc.
+  clients     Client[]
+}
+
+enum ProductType {
+  ROJO
+  BLANCO
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  type        ProductType @unique
+  boxSize     Int      @default(6) // Bottles per box
+  
+  movements   StockMovement[]
+}
+
+model Location {
+  id          String   @id @default(uuid())
+  name        String
+  isDefault   Boolean  @default(false)
+  movementsFrom StockMovement[] @relation("FromLocation")
+  movementsTo   StockMovement[] @relation("ToLocation")
+  event         Event?
+}
+
+enum MovementType {
+  BOTTLING      // Entrada Embotelladora
+  PURCHASE
+  SALE          // Venta
+  TRANSFER      // Transferencia Almacén <-> Eventos
+  PROMOTION     // Promoción
+  REPLACEMENT   // Reposición
+  SAMPLE        // Muestra
+  TASTING       // Cata
+  EVENT         // Evento
+  COURTESY      // Cortesía
+  BREAKAGE      // Rotura
+  SHRINKAGE     // Merma
+  INTERNAL      // Consumo Interno
+  ADJUSTMENT    // Ajuste
+  RETURN        // Devolución
+  OTHER
+}
+
+model StockMovement {
+  id             String       @id @default(uuid())
+  productId      String
+  product        Product      @relation(fields: [productId], references: [id])
+  quantity       Int          // in bottles
+  type           MovementType
+  productCost    Float        @default(4.05) // Snapshot del coste para valorar mermas, promos y devoluciones
+  date           DateTime     @default(now())
+  
+  stockBefore    Int          @default(0)
+  stockAfter     Int          @default(0)
+  reason         String?
+  user           String?      @default("Mari")
+  
+  fromLocationId String?
+  fromLocation   Location?    @relation("FromLocation", fields: [fromLocationId], references: [id])
+  toLocationId   String?
+  toLocation     Location?    @relation("ToLocation", fields: [toLocationId], references: [id])
+  referenceId    String?      // Can link to Order, Event, etc.
+}
+
+model Order {
+  id            String    @id @default(uuid())
+  clientId      String
+  client        Client    @relation(fields: [clientId], references: [id])
+  date          DateTime  @default(now())
+  status        String    @default("COMPLETED") // PENDING, COMPLETED
+  
+  boxesRojo     Int       @default(0)
+  boxesBlanco   Int       @default(0)
+  bottlesRojo   Int       @default(0)
+  bottlesBlanco Int       @default(0)
+  promoRojo     Int       @default(0)
+  promoBlanco   Int       @default(0)
+  totalBottles  Int       @default(0)
+  
+  productCost   Float     @default(4.05)
+  
+  deliveryNote  DeliveryNote?
+  invoice       Invoice?
+}
+
+model DeliveryNote {
+  id            String   @id @default(uuid())
+  number        String   @unique
+  orderId       String   @unique
+  order         Order    @relation(fields: [orderId], references: [id])
+  date          DateTime @default(now())
+}
+
+enum InvoiceStatus {
+  DRAFT
+  ISSUED
+  CANCELED
+}
+
+enum EmailStatus {
+  PENDING
+  SENDING
+  SENT
+  ERROR
+}
+
+model Invoice {
+  id            String   @id @default(uuid())
+  number        String   @unique // TEST-000001
+  orderId       String   @unique
+  order         Order    @relation(fields: [orderId], references: [id])
+  date          DateTime @default(now())
+  
+  subtotal      Float
+  vat           Float
+  total         Float
+  
+  status        InvoiceStatus @default(ISSUED)
+  emailStatus   EmailStatus   @default(PENDING)
+  
+  dueDate       DateTime
+  
+  lines         InvoiceLine[]
+}
+
+model InvoiceLine {
+  id            String   @id @default(uuid())
+  invoiceId     String
+  invoice       Invoice  @relation(fields: [invoiceId], references: [id])
+  description   String
+  quantity      Int      // Bottles
+  unitPrice     Float
+  discount      Float    @default(0)
+  total         Float
+}
+
+enum TransactionType {
+  RECEIVABLE  // A COBRAR
+  PAYABLE     // A PAGAR
+}
+
+enum TransactionStatus {
+  PENDING
+  PARTIAL
+  PAID
+}
+
+model Transaction {
+  id            String            @id @default(uuid())
+  type          TransactionType
+  status        TransactionStatus @default(PENDING)
+  amount        Float             // Total original amount
+  paidAmount    Float             @default(0) // Accumulated paid amount
+  expectedMethod String?          // Expected payment method (Transferencia, etc.)
+  dueDate       DateTime
+  date          DateTime          @default(now())
+  
+  clientId      String?
+  client        Client?           @relation(fields: [clientId], references: [id])
+  
+  supplierId    String?
+  supplier      Supplier?         @relation(fields: [supplierId], references: [id])
+  
+  referenceId   String?           // Invoice ID, Purchase ID, or Expense ID
+  
+  payments      PaymentMovement[]
+}
+
+model PaymentMovement {
+  id            String      @id @default(uuid())
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  amount        Float
+  date          DateTime    @default(now())
+  method        String
+  notes         String?
+}
+
+model Supplier {
+  id            String   @id @default(uuid())
+  name          String
+  cifNif        String?
+  transactions  Transaction[]
+}
+
+model Purchase {
+  id            String   @id @default(uuid())
+  supplierId    String
+  date          DateTime
+  total         Float
+}
+
+model Expense {
+  id            String   @id @default(uuid())
+  supplierName  String?
+  documentNo    String?
+  concept       String
+  category      String
+  
+  baseAmount    Float
+  vatPercent    Float    @default(21)
+  vatAmount     Float
+  amount        Float    // Total amount
+  
+  isPaid        Boolean  @default(false)
+  dueDate       DateTime?
+  date          DateTime @default(now())
+  
+  eventId       String?
+  event         Event?   @relation(fields: [eventId], references: [id])
+}
+
+model Event {
+  id            String    @id @default(uuid())
+  name          String
+  place         String?
+  date          DateTime
+  status        String    @default("OPEN")
+  revenue       Float     @default(0)
+  expenses      Expense[]
+  locationId    String?   @unique
+  location      Location? @relation(fields: [locationId], references: [id])
+}
