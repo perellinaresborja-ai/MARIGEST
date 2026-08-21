@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Link from "next/link";
 import { Toaster } from "@/components/ui/sonner";
+import { SplashScreen } from "@/components/SplashScreen";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,6 +20,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${inter.className} bg-slate-50 text-slate-900 min-h-screen flex flex-col overflow-x-hidden`}>
+        <SplashScreen />
         {/* Banner Modo Pruebas */}
         <div className="bg-amber-400 text-amber-950 font-bold text-center text-sm py-1">
           MODO PRUEBAS - Facturación sin valor fiscal
