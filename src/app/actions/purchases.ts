@@ -102,7 +102,7 @@ export async function createPurchase(data: {
     });
   });
 
-  revalidatePath("/producto");
-  revalidatePath("/");
+  revalidatePath("/producto", "layout");
+  revalidatePath("/", "layout");
   return { success: true };
 }
