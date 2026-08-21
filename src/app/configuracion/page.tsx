@@ -75,8 +75,8 @@ export default function ConfiguracionPage() {
             </div>
             <div className="space-y-2">
               <Label>Serie de Facturación Actual</Label>
-              <Input defaultValue="TEST" />
-              <p className="text-xs text-amber-600 mt-1">Actualmente en modo pruebas. Las facturas se generan como TEST-000X.</p>
+              <Input defaultValue="F" />
+              <p className="text-xs text-slate-500 mt-1">Las facturas se generan como F-000001 en adelante.</p>
             </div>
           </CardContent>
         </Card>

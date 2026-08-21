@@ -95,15 +95,15 @@ export async function processSale(data: {
       });
 
       // 3. Factura
-      // Encontrar último número de factura TEST
+      // Encontrar último número de factura F-
       const lastInvoice = await tx.invoice.findFirst({
-        where: { number: { startsWith: "TEST-" } },
+        where: { number: { startsWith: "F-" } },
         orderBy: { number: "desc" }
       });
-      let nextNumber = "TEST-000001";
+      let nextNumber = "F-000001";
       if (lastInvoice) {
-        const lastSeq = parseInt(lastInvoice.number.replace("TEST-", ""));
-        nextNumber = `TEST-${String(lastSeq + 1).padStart(6, '0')}`;
+        const lastSeq = parseInt(lastInvoice.number.replace("F-", ""));
+        nextNumber = `F-${String(lastSeq + 1).padStart(6, '0')}`;
       }
 
       const invoice = await tx.invoice.create({
