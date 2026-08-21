@@ -42,7 +42,7 @@ export default async function ClientesPage() {
                 clients.map((c) => (
                   <TableRow key={c.id}>
                     <TableCell className="font-medium">{c.commercialName}</TableCell>
-                    <TableCell>{c.type}</TableCell>
+                    <TableCell>{c.type === 'HOSTELERIA' ? 'Hostelería' : c.type === 'DISTRIBUIDOR' ? 'Distribuidor' : 'Particular'}</TableCell>
                     <TableCell>
                       {c.contactPerson && <div className="text-sm">{c.contactPerson}</div>}
                       {c.phone && <div className="text-xs text-slate-500">{c.phone}</div>}

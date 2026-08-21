@@ -1,4 +1,4 @@
-﻿"use server";
+"use server";
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
@@ -40,7 +40,7 @@ export async function createClient(data: any) {
     if (data.paymentTermDays) {
       const paymentTerm = await prisma.paymentTerm.create({
         data: {
-          name: `${data.paymentTermDays} dÃ­as`,
+          name: `${data.paymentTermDays} días`,
           days: parseInt(data.paymentTermDays)
         }
       });
@@ -85,26 +85,39 @@ export async function updateClient(id: string, data: any) {
     });
 
     // Update payment term
-    const termMap: Record<string, string> = {
-      "0": "Al contado",
-      "15": "15 días",
-      "30": "30 días",
-      "60": "60 días"
-    };
-
     if (data.paymentTermDays) {
-      const termName = termMap[data.paymentTermDays] || "Al contado";
-      const pt = await prisma.paymentTerm.findFirst({ where: { days: parseInt(data.paymentTermDays) } });
-      if (pt) {
+      let pt = await prisma.paymentTerm.findFirst({ where: { days: parseInt(data.paymentTermDays) } });
+      if (!pt) {
+        pt = await prisma.paymentTerm.create({ data: { name: `${data.paymentTermDays} días`, days: parseInt(data.paymentTermDays) } });
+      }
+      await prisma.client.update({
+        where: { id: client.id },
+        data: { paymentTermId: pt.id }
+      });
+    }
+
+    if (data.agreementType) {
+      if (data.agreementType === "NONE") {
+        await prisma.client.update({ where: { id: client.id }, data: { agreementId: null } });
+      } else {
+        const agreement = await prisma.commercialAgreement.create({
+          data: {
+            name: `Acuerdo - ${data.commercialName}`,
+            type: data.agreementType,
+            paramX: data.paramX ? parseInt(data.paramX) : null,
+            paramY: data.paramY ? parseInt(data.paramY) : null,
+            paramFloat: data.paramFloat ? parseFloat(data.paramFloat) : null,
+          }
+        });
         await prisma.client.update({
           where: { id: client.id },
-          data: { paymentTermId: pt.id }
+          data: { agreementId: agreement.id }
         });
       }
     }
 
     revalidatePath("/clientes");
-    revalidatePath(/clientes/ + id);
+    revalidatePath("/clientes/" + id);
     return { success: true, client };
   } catch (error: any) {
     return { success: false, error: error.message };

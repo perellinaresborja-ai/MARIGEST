@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Pencil } from "lucide-react";
 
 export default async function ClientProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -32,11 +33,23 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Link href="/clientes">
-          <Button variant="outline">Volver</Button>
-        </Link>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">{client.commercialName}</h1>
+      <div className="flex justify-between items-start">
+        <div>
+          <Link href="/clientes" className="text-sm text-slate-500 hover:underline mb-2 block">← Volver a clientes</Link>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">{client.commercialName}</h1>
+          <p className="text-slate-500">{client.legalName} • {client.cifNif}</p>
+        </div>
+        <div className="flex gap-2">
+          <Link href={`/clientes/${client.id}/editar`}>
+            <Button variant="outline" className="flex gap-2">
+              <Pencil size={16} />
+              Editar Cliente
+            </Button>
+          </Link>
+          <Button variant="default">
+            Nueva Venta
+          </Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -48,7 +61,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <p className="text-slate-500 font-medium">Tipo</p>
-                <p>{client.type}</p>
+                <p>{client.type === 'HOSTELERIA' ? 'Hostelería' : client.type === 'DISTRIBUIDOR' ? 'Distribuidor' : 'Particular'}</p>
               </div>
               <div>
                 <p className="text-slate-500 font-medium">Persona de contacto</p>
@@ -141,7 +154,17 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
                   </div>
                   <div className="text-right">
                     <p className="font-bold">{order.invoice?.total.toFixed(2)} €</p>
-                    <span className="text-xs text-rose-900 bg-rose-50 px-2 py-1 rounded">Cobrado (Test)</span>
+                    {order.transactions && order.transactions.length > 0 ? (
+                      order.transactions[0].status === "PAID" ? (
+                        <span className="text-xs text-emerald-900 bg-emerald-50 px-2 py-1 rounded">Cobrado</span>
+                      ) : order.transactions[0].status === "PARTIAL" ? (
+                        <span className="text-xs text-amber-900 bg-amber-50 px-2 py-1 rounded">Parcial</span>
+                      ) : (
+                        <span className="text-xs text-rose-900 bg-rose-50 px-2 py-1 rounded">Pendiente</span>
+                      )
+                    ) : (
+                      <span className="text-xs text-slate-500 bg-slate-50 px-2 py-1 rounded">Sin transacción</span>
+                    )}
                   </div>
                 </div>
               ))}

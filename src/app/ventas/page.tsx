@@ -124,7 +124,7 @@ export default function VentaAgilPage() {
               <h2 className="text-xl font-semibold">Añadir Producto</h2>
             </div>
             
-            <div className="grid grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* ROJO */}
               <div className="border rounded-xl p-6 flex flex-col items-center space-y-4 shadow-sm hover:border-rose-200 transition-colors">
                 <img src="/vermut-rojo.jpg" alt="Vermut Rojo" className="h-24 w-auto object-contain mb-2" />

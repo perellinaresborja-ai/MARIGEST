@@ -1,4 +1,3 @@
-process.env.DATABASE_URL = "file:./dev.db";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {

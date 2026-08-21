@@ -13,6 +13,8 @@ import { toast } from "sonner";
 export default function NuevoClientePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [type, setType] = useState("HOSTELERIA");
+  const [paymentTermDays, setPaymentTermDays] = useState("0");
   const [agreementType, setAgreementType] = useState("NONE");
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
@@ -21,6 +23,11 @@ export default function NuevoClientePage() {
     
     const formData = new FormData(e.currentTarget);
     const data = Object.fromEntries(formData.entries());
+    
+    // Ensure Select values are added to the data payload since base-ui might not inject hidden inputs
+    data.type = type;
+    data.paymentTermDays = paymentTermDays;
+    data.agreementType = agreementType;
     
     const res = await createClient(data);
     
@@ -47,14 +54,14 @@ export default function NuevoClientePage() {
             <CardDescription>Información comercial y fiscal.</CardDescription>
           </CardHeader>
           <CardContent className="p-6 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="commercialName">Nombre Comercial *</Label>
                 <Input id="commercialName" name="commercialName" required placeholder="Ej: Restaurante El Puerto" />
               </div>
               <div className="space-y-2">
                 <Label htmlFor="type">Tipo de Cliente *</Label>
-                <Select name="type" defaultValue="HOSTELERIA">
+                <Select name="type" value={type} onValueChange={setType}>
                   <SelectTrigger>
                     <SelectValue placeholder="Seleccionar..." />
                   </SelectTrigger>
@@ -66,7 +73,7 @@ export default function NuevoClientePage() {
                 </Select>
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="legalName">Razón Social</Label>
                 <Input id="legalName" name="legalName" />
@@ -88,7 +95,7 @@ export default function NuevoClientePage() {
             <CardTitle>Contacto y Facturación</CardTitle>
           </CardHeader>
           <CardContent className="p-6 space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="contactPerson">Persona de Contacto</Label>
                 <Input id="contactPerson" name="contactPerson" />
@@ -98,7 +105,7 @@ export default function NuevoClientePage() {
                 <Input id="phone" name="phone" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email de Contacto</Label>
                 <Input id="email" name="email" type="email" />
@@ -118,7 +125,7 @@ export default function NuevoClientePage() {
           <CardContent className="p-6 space-y-6">
             <div className="space-y-2">
               <Label htmlFor="paymentTermDays">Plazo de Pago (Días)</Label>
-              <Select name="paymentTermDays" defaultValue="0">
+              <Select name="paymentTermDays" value={paymentTermDays} onValueChange={setPaymentTermDays}>
                 <SelectTrigger>
                   <SelectValue placeholder="Al contado (0 días)" />
                 </SelectTrigger>
