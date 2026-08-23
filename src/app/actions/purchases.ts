@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth";
 "use server";
 
 import { prisma } from "@/lib/prisma";

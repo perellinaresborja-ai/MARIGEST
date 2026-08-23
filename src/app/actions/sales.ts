@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth";
 "use server";
 
 import { prisma } from "@/lib/prisma";
@@ -95,15 +96,17 @@ export async function processSale(data: {
       });
 
       // 3. Factura
-      // Encontrar último número de factura F-
+      // Encontrar último número de factura TEST-
       const lastInvoice = await tx.invoice.findFirst({
-        where: { number: { startsWith: "F-" } },
+        where: { number: { startsWith: "TEST-" } },
         orderBy: { number: "desc" }
       });
-      let nextNumber = "F-000001";
+      let nextNumber = "TEST-026041";
       if (lastInvoice) {
-        const lastSeq = parseInt(lastInvoice.number.replace("F-", ""));
-        nextNumber = `F-${String(lastSeq + 1).padStart(6, '0')}`;
+        const lastSeq = parseInt(lastInvoice.number.replace("TEST-", ""));
+        if (lastSeq >= 26041) {
+          nextNumber = `TEST-${String(lastSeq + 1).padStart(6, '0')}`;
+        }
       }
 
       const invoice = await tx.invoice.create({
@@ -115,7 +118,7 @@ export async function processSale(data: {
           total,
           dueDate,
           status: "ISSUED",
-          emailStatus: "SENT" // Simulación de envío automático
+          emailStatus: "PENDING" // No simular envío hasta tener la integración
         }
       });
       

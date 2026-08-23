@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth";
 "use server";
 
 import { prisma } from "@/lib/prisma";
@@ -5,6 +6,7 @@ import { TransactionType, TransactionStatus } from "@prisma/client";
 import { revalidatePath } from "next/cache";
 
 export async function addPayment(transactionId: string, amount: number, method: string, date: Date, notes?: string) {
+  await requireAuth();
   const tx = await prisma.transaction.findUnique({ where: { id: transactionId } });
   if (!tx) throw new Error("Transacción no encontrada");
 
@@ -114,6 +116,7 @@ export async function createExpense(data: {
 }
 
 export async function getTesoreriaDashboard() {
+  await requireAuth();
   const now = new Date();
   
   const transactions = await prisma.transaction.findMany({

@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth";
 "use server";
 
 import { prisma } from "@/lib/prisma";
@@ -94,6 +95,7 @@ export async function addStockMovement(data: {
 }
 
 export async function getStockMovements(take = 50) {
+  await requireAuth();
   return await prisma.stockMovement.findMany({
     orderBy: { date: "desc" },
     take,

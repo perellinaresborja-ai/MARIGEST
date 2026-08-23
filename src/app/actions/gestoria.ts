@@ -1,8 +1,10 @@
+import { requireAuth } from "@/lib/auth";
 "use server";
 
 import { prisma } from "@/lib/prisma";
 
 export async function getGestoriaData(period: string = "TRIMESTRE") {
+  await requireAuth();
   const now = new Date();
   let startDate = new Date();
   let endDate = new Date();

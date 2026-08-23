@@ -1,9 +1,11 @@
+import { requireAuth } from "@/lib/auth";
 "use server";
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function createClient(data: any) {
+  await requireAuth();
   try {
     const client = await prisma.client.create({
       data: {
@@ -59,6 +61,7 @@ export async function createClient(data: any) {
 }
 
 export async function getClients() {
+  await requireAuth();
   return await prisma.client.findMany({
     include: {
       agreement: true,
@@ -68,6 +71,7 @@ export async function getClients() {
   });
 }
 export async function updateClient(id: string, data: any) {
+  await requireAuth();
   try {
     const client = await prisma.client.update({
       where: { id },

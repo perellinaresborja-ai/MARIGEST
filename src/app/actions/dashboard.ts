@@ -1,3 +1,4 @@
+import { requireAuth } from "@/lib/auth";
 "use server";
 
 import { prisma } from "@/lib/prisma";
@@ -5,6 +6,7 @@ import { startOfMonth, startOfYear, endOfMonth, endOfYear, subMonths } from "dat
 import { getStockOverview } from "@/lib/stock";
 
 export async function getDashboardData() {
+  await requireAuth();
   const now = new Date();
   
   // 1. Ventas (Facturas emitidas o cobradas)
