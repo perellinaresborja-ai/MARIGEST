@@ -1,6 +1,5 @@
-import { requireAuth } from "@/lib/auth";
 "use server";
-
+import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
 export async function getGestoriaData(period: string = "TRIMESTRE") {

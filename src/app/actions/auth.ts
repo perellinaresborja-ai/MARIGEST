@@ -1,5 +1,4 @@
 "use server";
-
 import { cookies } from "next/headers";
 import { signToken } from "@/lib/auth";
 import bcrypt from "bcryptjs";
