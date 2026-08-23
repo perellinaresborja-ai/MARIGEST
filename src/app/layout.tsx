@@ -26,10 +26,6 @@ export default async function RootLayout({
     <html lang="es">
       <body className={`${inter.className} bg-slate-50 text-slate-900 min-h-screen flex flex-col overflow-x-hidden`}>
         <SplashScreen />
-        {/* Banner Modo Pruebas */}
-        <div className="bg-amber-400 text-amber-950 font-bold text-center text-sm py-1">
-          MODO PRUEBAS - Facturación sin valor fiscal
-        </div>
         
         {/* Navegación (solo si hay sesión) */}
         {session && (
