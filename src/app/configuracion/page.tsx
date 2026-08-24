@@ -111,11 +111,6 @@ export default function ConfiguracionPage() {
 
       </div>
       
-      <div className="flex justify-end pt-4">
-        <Button size="lg" className="bg-slate-900 hover:bg-slate-800">
-          <Save className="w-5 h-5 mr-2" />
-          Guardar Configuración
-        </Button>
       </div>
     </div>
   );

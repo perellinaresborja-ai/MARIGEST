@@ -38,7 +38,6 @@ export default async function GestoriaPage({ searchParams }: { searchParams: Pro
                 <CardTitle>Facturas Emitidas</CardTitle>
                 <CardDescription>Ventas a clientes</CardDescription>
               </div>
-              <Button variant="outline" size="sm" className="h-8"><Download className="w-4 h-4 mr-2"/> CSV</Button>
             </div>
           </CardHeader>
           <CardContent className="pt-6 space-y-4">
@@ -65,7 +64,6 @@ export default async function GestoriaPage({ searchParams }: { searchParams: Pro
                 <CardTitle>Compras y Gastos</CardTitle>
                 <CardDescription>Facturas recibidas</CardDescription>
               </div>
-              <Button variant="outline" size="sm" className="h-8"><Download className="w-4 h-4 mr-2"/> CSV</Button>
             </div>
           </CardHeader>
           <CardContent className="pt-6 space-y-4">
