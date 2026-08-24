@@ -18,25 +18,25 @@ export default async function GestoriaPage({ searchParams }: { searchParams: Pro
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Gestoría</h1>
           <p className="text-rose-800/80 font-medium">Información de gestión interna. No constituye liquidación fiscal oficial (AEAT).</p>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <div className="flex bg-white p-1 rounded-lg text-sm border shadow-sm">
+        <div className="flex flex-col items-stretch gap-2 w-full md:w-[400px]">
+          <div className="flex bg-white p-1 rounded-lg text-sm border shadow-sm w-full">
             {["MES", "TRIMESTRE", "AÑO", "TODO"].map(p => (
               <a 
                 key={p} 
                 href={`/gestoria?period=${p}`} 
-                className={`px-4 py-2 rounded-md ${period === p && !start ? 'bg-rose-900 shadow-sm font-bold text-white' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`flex-1 text-center px-2 py-2 rounded-md ${period === p && !start ? 'bg-rose-900 shadow-sm font-bold text-white' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 {p}
               </a>
             ))}
           </div>
           
-          <form action="/gestoria" method="GET" className="flex gap-2 items-center text-sm bg-white p-1.5 rounded-lg border shadow-sm">
-            <span className="text-slate-500 font-medium px-2">Fechas:</span>
-            <input type="date" name="start" defaultValue={start} required className="border rounded px-2 py-1 text-slate-700" />
+          <form action="/gestoria" method="GET" className="flex justify-between gap-1 items-center text-sm bg-white p-1.5 rounded-lg border shadow-sm w-full">
+            <span className="text-slate-500 font-medium px-1">Fechas:</span>
+            <input type="date" name="start" defaultValue={start} required className="border rounded px-1 py-1 text-slate-700 w-28" />
             <span className="text-slate-400">-</span>
-            <input type="date" name="end" defaultValue={end} required className="border rounded px-2 py-1 text-slate-700" />
-            <button type="submit" className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded font-medium border">Ver</button>
+            <input type="date" name="end" defaultValue={end} required className="border rounded px-1 py-1 text-slate-700 w-28" />
+            <button type="submit" className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded font-medium border flex-1 ml-1">Ver</button>
           </form>
         </div>
       </div>

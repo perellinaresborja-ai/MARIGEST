@@ -17,25 +17,25 @@ export default async function NegocioPage({ searchParams }: { searchParams: Prom
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Resumen</h1>
           <p className="text-slate-500">Rentabilidad, canales y rendimiento comercial.</p>
         </div>
-        <div className="flex flex-col items-end gap-2">
-          <div className="flex bg-slate-100 p-1 rounded-lg text-sm">
+        <div className="flex flex-col items-stretch gap-2 w-full md:w-[400px]">
+          <div className="flex bg-slate-100 p-1 rounded-lg text-sm w-full">
             {["MES", "TRIMESTRE", "AÑO", "TODO"].map(p => (
               <a 
                 key={p} 
                 href={`/negocio?period=${p}`} 
-                className={`px-4 py-2 rounded-md ${period === p && !start ? 'bg-white shadow-sm font-bold text-slate-900' : 'text-slate-600 hover:text-slate-900'}`}
+                className={`flex-1 text-center px-2 py-2 rounded-md ${period === p && !start ? 'bg-white shadow-sm font-bold text-slate-900' : 'text-slate-600 hover:text-slate-900'}`}
               >
                 {p}
               </a>
             ))}
           </div>
           
-          <form action="/negocio" method="GET" className="flex gap-2 items-center text-sm bg-slate-100 p-1 rounded-lg">
-            <span className="text-slate-500 font-medium px-2">Fechas:</span>
-            <input type="date" name="start" defaultValue={start} required className="border rounded px-2 py-1 text-slate-700 bg-white" />
+          <form action="/negocio" method="GET" className="flex justify-between gap-1 items-center text-sm bg-slate-100 p-1 rounded-lg w-full">
+            <span className="text-slate-500 font-medium px-1">Fechas:</span>
+            <input type="date" name="start" defaultValue={start} required className="border rounded px-1 py-1 text-slate-700 bg-white w-28" />
             <span className="text-slate-400">-</span>
-            <input type="date" name="end" defaultValue={end} required className="border rounded px-2 py-1 text-slate-700 bg-white" />
-            <button type="submit" className="bg-white hover:bg-slate-50 text-slate-700 px-3 py-1 rounded font-medium border shadow-sm">Ver</button>
+            <input type="date" name="end" defaultValue={end} required className="border rounded px-1 py-1 text-slate-700 bg-white w-28" />
+            <button type="submit" className="bg-white hover:bg-slate-50 text-slate-700 px-3 py-1 rounded font-medium border shadow-sm flex-1 ml-1">Ver</button>
           </form>
         </div>
       </div>
