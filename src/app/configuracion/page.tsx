@@ -75,8 +75,8 @@ export default function ConfiguracionPage() {
             </div>
             <div className="space-y-2">
               <Label>Serie de Facturación Actual</Label>
-              <Input defaultValue="F" />
-              <p className="text-xs text-slate-500 mt-1">Las facturas se generan como F-000001 en adelante.</p>
+              <Input defaultValue="F-" />
+              <p className="text-xs text-slate-500 mt-1">Las facturas se generan correlativamente desde F-026041 en adelante.</p>
             </div>
           </CardContent>
         </Card>
