@@ -26,11 +26,18 @@ export async function login(formData: FormData) {
     return { success: false, error: `Demasiados intentos. Inténtalo de nuevo en ${minutesLeft} minuto(s).` };
   }
 
-  // Fallback hash in case env var is missing
-  const adminPasswordHash = (process.env.ADMIN_PASSWORD_HASH || "$2b$10$3iDjBAZ.VY44EXqlAHEf6ea6lyjJh./VFmp2fkk7UOMDwUttbqx0.").trim();
+  // Fallback hash in case env var is missing or invalid
+  let adminPasswordHash = (process.env.ADMIN_PASSWORD_HASH || "").trim();
+  if (!adminPasswordHash.startsWith("$2")) {
+    adminPasswordHash = "$2b$10$3iDjBAZ.VY44EXqlAHEf6ea6lyjJh./VFmp2fkk7UOMDwUttbqx0.";
+  }
 
   const isEmailValid = inputEmail === envEmail;
   const isPasswordValid = isEmailValid ? await bcrypt.compare(password.trim(), adminPasswordHash) : false;
+
+  if (!isEmailValid || !isPasswordValid) {
+    console.error(`Fallo de login. isEmailValid: ${isEmailValid}, isPasswordValid: ${isPasswordValid}. (Email introducido: ${inputEmail})`);
+  }
 
   if (isEmailValid && isPasswordValid) {
     // Reset attempts on success
