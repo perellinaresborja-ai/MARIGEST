@@ -2,13 +2,17 @@
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function getGestoriaData(period: string = "TRIMESTRE") {
+export async function getGestoriaData(period: string = "TRIMESTRE", customStart?: string, customEnd?: string) {
   await requireAuth();
   const now = new Date();
   let startDate = new Date();
   let endDate = new Date();
   
-  if (period === "MES") {
+  if (customStart && customEnd) {
+    startDate = new Date(customStart);
+    endDate = new Date(customEnd);
+    endDate.setHours(23, 59, 59, 999);
+  } else if (period === "MES") {
     startDate.setDate(1);
     startDate.setHours(0, 0, 0, 0);
   } else if (period === "TRIMESTRE") {

@@ -3,29 +3,41 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Download } from "lucide-react";
 
-export default async function GestoriaPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
+export default async function GestoriaPage({ searchParams }: { searchParams: Promise<{ period?: string, start?: string, end?: string }> }) {
   const params = await searchParams;
   const period = params.period || "TRIMESTRE";
+  const start = params.start;
+  const end = params.end;
   
-  const data = await getGestoriaData(period);
+  const data = await getGestoriaData(period, start, end);
 
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
-      <div className="flex justify-between items-center bg-rose-50 p-6 rounded-xl border border-rose-100">
+      <div className="flex flex-col md:flex-row justify-between items-center bg-rose-50 p-6 rounded-xl border border-rose-100 gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Gestoría</h1>
           <p className="text-rose-800/80 font-medium">Información de gestión interna. No constituye liquidación fiscal oficial (AEAT).</p>
         </div>
-        <div className="flex bg-white p-1 rounded-lg text-sm border shadow-sm">
-          {["MES", "TRIMESTRE", "AÑO", "TODO"].map(p => (
-            <a 
-              key={p} 
-              href={`/gestoria?period=${p}`} 
-              className={`px-4 py-2 rounded-md ${period === p ? 'bg-rose-900 shadow-sm font-bold text-white' : 'text-slate-600 hover:text-slate-900'}`}
-            >
-              {p}
-            </a>
-          ))}
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex bg-white p-1 rounded-lg text-sm border shadow-sm">
+            {["MES", "TRIMESTRE", "AÑO", "TODO"].map(p => (
+              <a 
+                key={p} 
+                href={`/gestoria?period=${p}`} 
+                className={`px-4 py-2 rounded-md ${period === p && !start ? 'bg-rose-900 shadow-sm font-bold text-white' : 'text-slate-600 hover:text-slate-900'}`}
+              >
+                {p}
+              </a>
+            ))}
+          </div>
+          
+          <form action="/gestoria" method="GET" className="flex gap-2 items-center text-sm bg-white p-1.5 rounded-lg border shadow-sm">
+            <span className="text-slate-500 font-medium px-2">Fechas:</span>
+            <input type="date" name="start" defaultValue={start} required className="border rounded px-2 py-1 text-slate-700" />
+            <span className="text-slate-400">-</span>
+            <input type="date" name="end" defaultValue={end} required className="border rounded px-2 py-1 text-slate-700" />
+            <button type="submit" className="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-1 rounded font-medium border">Ver</button>
+          </form>
         </div>
       </div>
 
@@ -111,10 +123,10 @@ export default async function GestoriaPage({ searchParams }: { searchParams: Pro
       </div>
       
       <div className="flex justify-center pt-8">
-        <a href={`/api/export-gestoria?period=${period}`}>
+        <a href={`/api/export-gestoria?period=${period}${start ? `&start=${start}&end=${end}` : ''}`}>
           <Button size="lg" className="bg-slate-900 hover:bg-slate-800 h-14 px-8 text-lg shadow-lg">
             <Download className="w-5 h-5 mr-3" />
-            EXPORTAR {period} (EXCEL XLSX)
+            EXPORTAR {start ? 'FECHAS SELECCIONADAS' : period} (EXCEL XLSX)
           </Button>
         </a>
       </div>
