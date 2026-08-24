@@ -15,7 +15,7 @@ export async function login(formData: FormData) {
   }
 
   const inputEmail = email.toLowerCase().trim();
-  const envEmail = (process.env.ADMIN_EMAIL || "marijsanchezdiaz@gmail.com").toLowerCase().trim();
+  const envEmail = (process.env.ADMIN_EMAIL || "").toLowerCase().trim();
 
   // Rate limiting check
   const now = Date.now();
@@ -26,10 +26,12 @@ export async function login(formData: FormData) {
     return { success: false, error: `Demasiados intentos. Inténtalo de nuevo en ${minutesLeft} minuto(s).` };
   }
 
-  // Fallback hash in case env var is missing or invalid
-  let adminPasswordHash = (process.env.ADMIN_PASSWORD_HASH || "").trim();
-  if (!adminPasswordHash.startsWith("$2")) {
-    adminPasswordHash = "$2b$10$3iDjBAZ.VY44EXqlAHEf6ea6lyjJh./VFmp2fkk7UOMDwUttbqx0.";
+  // Strict check against Vercel Environment Variables only
+  const adminPasswordHash = (process.env.ADMIN_PASSWORD_HASH || "").trim();
+  
+  if (!envEmail || !adminPasswordHash) {
+    console.error("Configuración de servidor incompleta: Faltan variables de entorno.");
+    return { success: false, error: "Error interno del servidor. Contacte al administrador." };
   }
 
   const isEmailValid = inputEmail === envEmail;
