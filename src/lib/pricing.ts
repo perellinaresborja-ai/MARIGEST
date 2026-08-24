@@ -5,7 +5,7 @@ export const BOX_SIZE = 6;
 
 export const PRICES = {
   DISTRIBUIDOR: 6.40,
-  HOSTELERIA: 8.20,
+  HOSTELERIA: 8.40,
   PARTICULAR_BOTTLE: 10.00,
   PARTICULAR_BOX: 50.00,
 };
