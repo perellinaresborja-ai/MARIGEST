@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Download, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
+import { RefundButton } from "@/components/RefundButton";
 import { PrintButton } from "@/components/PrintButton";
 
 export default async function FacturaViewPage({ params }: { params: Promise<{ id: string }> }) {
@@ -13,6 +14,13 @@ export default async function FacturaViewPage({ params }: { params: Promise<{ id
     where: { id },
     include: {
       lines: true,
+      originalInvoice: {
+        include: {
+          order: {
+            include: { client: { include: { paymentTerm: true } } }
+          }
+        }
+      },
       order: {
         include: {
           client: {
@@ -27,7 +35,12 @@ export default async function FacturaViewPage({ params }: { params: Promise<{ id
 
   if (!invoice) notFound();
 
-  const client = invoice.order.client;
+  // En rectificativas puede no haber order, pero para MVP heredamos el cliente de la original si no hay
+  const client = invoice.order?.client || invoice.originalInvoice?.order?.client;
+  
+  if (!client) {
+    return <div>Error: No se ha encontrado el cliente asociado a esta factura.</div>;
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 py-8 print:bg-white print:py-0">
@@ -38,6 +51,7 @@ export default async function FacturaViewPage({ params }: { params: Promise<{ id
           <Button variant="outline" className="bg-white"><ArrowLeft className="w-4 h-4 mr-2"/> Volver a Ventas</Button>
         </Link>
         <div className="flex gap-4">
+          {invoice.type === "NORMAL" && <RefundButton invoiceId={invoice.id} lines={invoice.lines} />}
           <PrintButton />
         </div>
       </div>
@@ -50,8 +64,13 @@ export default async function FacturaViewPage({ params }: { params: Promise<{ id
           <div>
             {/* Logo inyectado */}
             <img src="/cellernazihalogo.jpg" alt="Celler Naziha Logo" className="h-36 w-auto mb-4 -mt-4 object-contain mix-blend-multiply" />
-            <h1 className="text-3xl font-black text-rose-900 tracking-tighter">FACTURA</h1>
+            <h1 className={`text-3xl font-black tracking-tighter ${invoice.type === 'RECTIFICATIVA' ? 'text-slate-900' : 'text-rose-900'}`}>
+              {invoice.type === 'RECTIFICATIVA' ? 'FACTURA RECTIFICATIVA' : 'FACTURA'}
+            </h1>
             <p className="text-slate-500 font-medium mt-1">Nº {invoice.number}</p>
+            {invoice.type === 'RECTIFICATIVA' && invoice.originalInvoice && (
+              <p className="text-slate-600 text-sm font-bold mt-1">Rectifica a: {invoice.originalInvoice.number}</p>
+            )}
             <p className="text-slate-500 text-sm">Fecha: {new Date(invoice.date).toLocaleDateString()}</p>
           </div>
           

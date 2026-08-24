@@ -45,18 +45,17 @@ export async function getNegocioDashboard(period: string = "MES", customStart?: 
   };
 
   orders.forEach(o => {
-    const invTotal = o.invoice ? o.invoice.total : 0; // PVP con IVA, o podemos usar subtotal
+    const invTotal = o.invoice ? o.invoice.total : 0; 
     const baseTotal = o.invoice ? o.invoice.subtotal : 0;
     
     facturacion += baseTotal;
     
-    const botVentas = (o.boxesRojo + o.boxesBlanco) * 6; // Assuming boxes are stored as quantities
+    const botVentas = (o.boxesRojo + o.boxesBlanco) * 6;
     const botPromo = o.promoRojo + o.promoBlanco;
     
     botellasVendidas += botVentas;
     botellasPromo += botPromo;
     
-    // Coste real histórico guardado en el pedido
     const costeTotalOp = (botVentas + botPromo) * o.productCost;
     costeProductoVendido += costeTotalOp;
     
@@ -65,6 +64,45 @@ export async function getNegocioDashboard(period: string = "MES", customStart?: 
       canalStats[clientType as keyof typeof canalStats].facturacion += baseTotal;
       canalStats[clientType as keyof typeof canalStats].botellas += botVentas + botPromo;
       canalStats[clientType as keyof typeof canalStats].coste += costeTotalOp;
+    }
+  });
+
+  // 1.b RECTIFICATIVAS (Restar abonos)
+  const rectificativas = await prisma.invoice.findMany({
+    where: { 
+      type: "RECTIFICATIVA", 
+      date: { gte: startDate, lte: endDate } 
+    },
+    include: {
+      originalInvoice: {
+        include: { order: { include: { client: true } } }
+      },
+      lines: true
+    }
+  });
+
+  rectificativas.forEach(r => {
+    // r.subtotal is already negative
+    facturacion += r.subtotal;
+    
+    let returnedBottles = 0;
+    r.lines.forEach(l => {
+      // l.quantity is negative in our implementation
+      returnedBottles += Math.abs(l.quantity); 
+    });
+
+    // We assume cost is same as original order
+    const origCost = r.originalInvoice?.order?.productCost || 4.05;
+    const returnedCost = returnedBottles * origCost;
+    
+    botellasVendidas -= returnedBottles;
+    costeProductoVendido -= returnedCost;
+
+    const clientType = r.originalInvoice?.order?.client?.type || "PARTICULAR";
+    if (canalStats[clientType as keyof typeof canalStats]) {
+      canalStats[clientType as keyof typeof canalStats].facturacion += r.subtotal; // adds negative
+      canalStats[clientType as keyof typeof canalStats].botellas -= returnedBottles;
+      canalStats[clientType as keyof typeof canalStats].coste -= returnedCost;
     }
   });
 
@@ -82,12 +120,10 @@ export async function getNegocioDashboard(period: string = "MES", customStart?: 
   let pendienteCobro = 0;
   receivables.forEach(r => {
     const pend = r.amount - r.paidAmount;
-    if (pend > 0) {
-      pendienteCobro += pend;
-      const clientType = r.client?.type || "PARTICULAR";
-      if (canalStats[clientType as keyof typeof canalStats]) {
-        canalStats[clientType as keyof typeof canalStats].pendiente += pend;
-      }
+    pendienteCobro += pend;
+    const clientType = r.client?.type || "PARTICULAR";
+    if (canalStats[clientType as keyof typeof canalStats]) {
+      canalStats[clientType as keyof typeof canalStats].pendiente += pend;
     }
   });
 

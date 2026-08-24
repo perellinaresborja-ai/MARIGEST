@@ -190,9 +190,14 @@ enum EmailStatus {
 model Invoice {
   id            String   @id @default(uuid())
   number        String   @unique // TEST-000001
-  orderId       String   @unique
-  order         Order    @relation(fields: [orderId], references: [id])
+  orderId       String?  @unique // Puede ser opcional en rectificativas si no hay un nuevo Order
+  order         Order?   @relation(fields: [orderId], references: [id])
   date          DateTime @default(now())
+  
+  type          String   @default("NORMAL") // NORMAL, RECTIFICATIVA
+  originalInvoiceId String?
+  originalInvoice   Invoice?  @relation("Rectificativa", fields: [originalInvoiceId], references: [id])
+  rectificativas    Invoice[] @relation("Rectificativa")
   
   subtotal      Float
   vat           Float
@@ -212,6 +217,7 @@ model InvoiceLine {
   invoice       Invoice  @relation(fields: [invoiceId], references: [id])
   description   String
   quantity      Int      // Bottles
+  refundedQuantity Int   @default(0)
   unitPrice     Float
   discount      Float    @default(0)
   total         Float

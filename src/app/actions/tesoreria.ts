@@ -140,7 +140,7 @@ export async function getTesoreriaDashboard() {
 
   for (const t of transactions) {
     const pending = t.amount - t.paidAmount;
-    if (pending <= 0) continue;
+    if (Math.abs(pending) < 0.01) continue;
 
     const days = getDaysDiff(t.dueDate);
     const isVencido = days < 0;
