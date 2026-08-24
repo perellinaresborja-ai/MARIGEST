@@ -110,8 +110,6 @@ export default function ConfiguracionPage() {
         </Card>
 
       </div>
-      
-      </div>
     </div>
   );
 }
