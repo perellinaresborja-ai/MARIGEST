@@ -14,21 +14,23 @@ export async function login(formData: FormData) {
     return { success: false, error: "Email y contraseña son requeridos" };
   }
 
+  const inputEmail = email.toLowerCase().trim();
+  const envEmail = (process.env.ADMIN_EMAIL || "marijsanchezdiaz@gmail.com").toLowerCase().trim();
+
   // Rate limiting check
   const now = Date.now();
-  const attempt = loginAttempts.get(email) || { count: 0, lockedUntil: 0 };
+  const attempt = loginAttempts.get(inputEmail) || { count: 0, lockedUntil: 0 };
   
   if (attempt.lockedUntil > now) {
     const minutesLeft = Math.ceil((attempt.lockedUntil - now) / 60000);
     return { success: false, error: `Demasiados intentos. Inténtalo de nuevo en ${minutesLeft} minuto(s).` };
   }
 
-  const adminEmail = process.env.ADMIN_EMAIL || "marijsanchezdiaz@gmail.com";
-  // Fallback hash for "Maria@1976" in case env var is missing
-  const adminPasswordHash = process.env.ADMIN_PASSWORD_HASH || "$2b$10$3iDjBAZ.VY44EXqlAHEf6ea6lyjJh./VFmp2fkk7UOMDwUttbqx0.";
+  // Fallback hash in case env var is missing
+  const adminPasswordHash = (process.env.ADMIN_PASSWORD_HASH || "$2b$10$3iDjBAZ.VY44EXqlAHEf6ea6lyjJh./VFmp2fkk7UOMDwUttbqx0.").trim();
 
-  const isEmailValid = email === adminEmail;
-  const isPasswordValid = isEmailValid ? await bcrypt.compare(password, adminPasswordHash) : false;
+  const isEmailValid = inputEmail === envEmail;
+  const isPasswordValid = isEmailValid ? await bcrypt.compare(password.trim(), adminPasswordHash) : false;
 
   if (isEmailValid && isPasswordValid) {
     // Reset attempts on success
