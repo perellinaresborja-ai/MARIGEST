@@ -91,7 +91,7 @@ export default function ConfiguracionPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>PVP Hostelería</Label>
-                <Input defaultValue="8.40" />
+                <Input defaultValue="8.20" />
               </div>
               <div className="space-y-2">
                 <Label>PVP Distribuidor</Label>
