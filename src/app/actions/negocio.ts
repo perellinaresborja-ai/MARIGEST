@@ -2,12 +2,17 @@
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function getNegocioDashboard(period: string = "MES") {
+export async function getNegocioDashboard(period: string = "MES", customStart?: string, customEnd?: string) {
   await requireAuth();
   const now = new Date();
   let startDate = new Date();
+  let endDate = new Date();
   
-  if (period === "MES") {
+  if (customStart && customEnd) {
+    startDate = new Date(customStart);
+    endDate = new Date(customEnd);
+    endDate.setHours(23, 59, 59, 999);
+  } else if (period === "MES") {
     startDate.setDate(1);
     startDate.setHours(0, 0, 0, 0);
   } else if (period === "TRIMESTRE") {
@@ -24,7 +29,7 @@ export async function getNegocioDashboard(period: string = "MES") {
 
   // 1. FACTURACIÓN Y BOTELLAS VENDIDAS
   const orders = await prisma.order.findMany({
-    where: { date: { gte: startDate } },
+    where: { date: { gte: startDate, lte: endDate } },
     include: { invoice: true, client: true }
   });
 
@@ -65,13 +70,13 @@ export async function getNegocioDashboard(period: string = "MES") {
 
   // 2. GASTOS
   const expenses = await prisma.expense.findMany({
-    where: { date: { gte: startDate } }
+    where: { date: { gte: startDate, lte: endDate } }
   });
   const gastosTotales = expenses.reduce((sum, e) => sum + e.baseAmount, 0);
 
   // 3. PENDIENTE DE COBRO
   const receivables = await prisma.transaction.findMany({
-    where: { type: "RECEIVABLE", date: { gte: startDate } },
+    where: { type: "RECEIVABLE", date: { gte: startDate, lte: endDate } },
     include: { client: true }
   });
   let pendienteCobro = 0;

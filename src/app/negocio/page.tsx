@@ -1,30 +1,42 @@
 import { getNegocioDashboard } from "@/app/actions/negocio";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default async function NegocioPage({ searchParams }: { searchParams: Promise<{ period?: string }> }) {
+export default async function NegocioPage({ searchParams }: { searchParams: Promise<{ period?: string, start?: string, end?: string }> }) {
   const params = await searchParams;
   const period = params.period || "MES";
+  const start = params.start;
+  const end = params.end;
   
-  const data = await getNegocioDashboard(period);
+  const data = await getNegocioDashboard(period, start, end);
   const { kpis, canales } = data;
 
   return (
     <div className="space-y-8">
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Resumen</h1>
           <p className="text-slate-500">Rentabilidad, canales y rendimiento comercial.</p>
         </div>
-        <div className="flex bg-slate-100 p-1 rounded-lg text-sm">
-          {["MES", "TRIMESTRE", "AÑO", "TODO"].map(p => (
-            <a 
-              key={p} 
-              href={`/negocio?period=${p}`} 
-              className={`px-4 py-2 rounded-md ${period === p ? 'bg-white shadow-sm font-bold text-slate-900' : 'text-slate-600 hover:text-slate-900'}`}
-            >
-              {p}
-            </a>
-          ))}
+        <div className="flex flex-col items-end gap-2">
+          <div className="flex bg-slate-100 p-1 rounded-lg text-sm">
+            {["MES", "TRIMESTRE", "AÑO", "TODO"].map(p => (
+              <a 
+                key={p} 
+                href={`/negocio?period=${p}`} 
+                className={`px-4 py-2 rounded-md ${period === p && !start ? 'bg-white shadow-sm font-bold text-slate-900' : 'text-slate-600 hover:text-slate-900'}`}
+              >
+                {p}
+              </a>
+            ))}
+          </div>
+          
+          <form action="/negocio" method="GET" className="flex gap-2 items-center text-sm bg-slate-100 p-1 rounded-lg">
+            <span className="text-slate-500 font-medium px-2">Fechas:</span>
+            <input type="date" name="start" defaultValue={start} required className="border rounded px-2 py-1 text-slate-700 bg-white" />
+            <span className="text-slate-400">-</span>
+            <input type="date" name="end" defaultValue={end} required className="border rounded px-2 py-1 text-slate-700 bg-white" />
+            <button type="submit" className="bg-white hover:bg-slate-50 text-slate-700 px-3 py-1 rounded font-medium border shadow-sm">Ver</button>
+          </form>
         </div>
       </div>
 
