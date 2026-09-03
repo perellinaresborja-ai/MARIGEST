@@ -21,8 +21,7 @@ export default function LoginPage() {
       const result = await login(formData);
 
       if (result.success) {
-        router.push("/");
-        router.refresh();
+        window.location.href = "/";
       } else {
         setError(result.error || "PIN incorrecto");
         setLoading(false);

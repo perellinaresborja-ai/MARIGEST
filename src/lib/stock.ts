@@ -62,19 +62,14 @@ export async function getProductStock(productId: string, locationId?: string) {
 export async function getStockOverview() {
   const products = await prisma.product.findMany();
   
-  // Find or create default location (Almacén Principal)
+  // Find default location (Almacén Principal)
   let defaultLocation = await prisma.location.findFirst({ where: { isDefault: true } });
-  if (!defaultLocation) {
-    defaultLocation = await prisma.location.create({
-      data: { name: "Almacén Principal", isDefault: true }
-    });
-  }
-
+  
   const result = [];
   
   for (const p of products) {
     const total = await getProductStock(p.id);
-    const almacen = await getProductStock(p.id, defaultLocation.id);
+    const almacen = defaultLocation ? await getProductStock(p.id, defaultLocation.id) : total;
     const fuera = total - almacen;
     
     result.push({
