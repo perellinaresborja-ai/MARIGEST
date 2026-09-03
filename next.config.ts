@@ -16,3 +16,5 @@ export default nextConfig;
 // ultimate restart
 
 // ultimate restart 2
+
+// force hostinger restart
