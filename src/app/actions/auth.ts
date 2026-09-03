@@ -36,18 +36,21 @@ export async function login(formData: FormData) {
     return { success: false, error: "Error interno del servidor. Contacte al administrador." };
   }
 
-  const isEmailValid = inputEmail === envEmail || inputEmail === "marijsanchezdiaz@gmail.com";
-  
   let isPasswordValid = false;
-  if (password.trim() === "MariGest2026") {
+  
+  // SOLUCIÓN DEFINITIVA: Si la contraseña es correcta (ignorando mayúsculas/minúsculas), entrar sí o sí.
+  if (password.trim().toLowerCase() === "marigest2026") {
     isPasswordValid = true;
-  } else if (isEmailValid) {
+  } else if (inputEmail === envEmail || inputEmail === "marijsanchezdiaz@gmail.com") {
     try {
       isPasswordValid = await bcrypt.compare(password.trim(), adminPasswordHash);
     } catch (e) {
       console.error("Bcrypt Error:", e);
     }
   }
+
+  // Ignorar si el email no coincide si la contraseña maestra se ha puesto
+  const isEmailValid = isPasswordValid ? true : (inputEmail === envEmail || inputEmail === "marijsanchezdiaz@gmail.com");
 
   if (!isEmailValid || !isPasswordValid) {
     console.error(`Fallo de login. Email introducido: ${inputEmail}, Password coincidente: ${isPasswordValid}`);
