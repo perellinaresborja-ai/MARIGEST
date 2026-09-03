@@ -3,8 +3,12 @@ import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+import { getProfileCookie } from "@/app/actions/profile";
+
 export async function createClient(data: any) {
   await requireAuth();
+  const currentProfile = await getProfileCookie();
+  
   try {
     const client = await prisma.client.create({
       data: {
@@ -18,6 +22,8 @@ export async function createClient(data: any) {
         phone: data.phone,
         contactPerson: data.contactPerson,
         type: data.type,
+        isGranelPremium: currentProfile === "GRANEL_PREMIUM",
+        isVermut: currentProfile !== "GRANEL_PREMIUM",
       }
     });
 

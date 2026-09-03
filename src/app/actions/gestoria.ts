@@ -1,8 +1,8 @@
-"use server";
+﻿"use server";
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function getGestoriaData(period: string = "TRIMESTRE", customStart?: string, customEnd?: string) {
+export async function getGestoriaData(period: string = "TRIMESTRE", customStart?: string, customEnd?: string, profileFilter: string = "GENERAL") {
   await requireAuth();
   const now = new Date();
   let startDate = new Date();
@@ -27,10 +27,13 @@ export async function getGestoriaData(period: string = "TRIMESTRE", customStart?
     startDate = new Date(2000, 0, 1);
   }
 
-  // 1. FACTURAS EMITIDAS (VENTAS)
-  const invoices = await prisma.invoice.findMany({
-    where: { date: { gte: startDate, lte: endDate } }
-  });
+  // Filtro de negocio para Invoices (Ventas)
+  const invoiceWhere: any = { date: { gte: startDate, lte: endDate } };
+  if (profileFilter !== "GENERAL") {
+    invoiceWhere.businessProfile = profileFilter;
+  }
+  
+  const invoices = await prisma.invoice.findMany({ where: invoiceWhere });
   
   const emitidas = invoices.reduce((acc, inv) => {
     acc.base += inv.subtotal;
@@ -39,14 +42,15 @@ export async function getGestoriaData(period: string = "TRIMESTRE", customStart?
     return acc;
   }, { base: 0, iva: 0, total: 0 });
 
-  // 2. FACTURAS RECIBIDAS (COMPRAS DE MERCANCÍA)
-  const purchases = await prisma.purchase.findMany({
-    where: { date: { gte: startDate, lte: endDate } }
-  });
+  // FACTURAS RECIBIDAS (COMPRAS DE MERCANCÍA - Solo Vermut/General por ahora)
+  let purchases: any[] = [];
+  if (profileFilter !== "GRANEL_PREMIUM") {
+    purchases = await prisma.purchase.findMany({
+      where: { date: { gte: startDate, lte: endDate } }
+    });
+  }
   
   const recibidas = purchases.reduce((acc, p) => {
-    // Assuming purchase amount is total. For Gestoria, let's reverse calculate 21% IVA if not specified
-    // In a real app we'd have subtotal and tax on purchases too. For now we estimate standard 21%
     const base = p.total / 1.21;
     const iva = p.total - base;
     acc.base += base;
@@ -55,10 +59,13 @@ export async function getGestoriaData(period: string = "TRIMESTRE", customStart?
     return acc;
   }, { base: 0, iva: 0, total: 0 });
 
-  // 3. GASTOS GENERALES
-  const expenses = await prisma.expense.findMany({
-    where: { date: { gte: startDate, lte: endDate } }
-  });
+  // GASTOS GENERALES
+  const expenseWhere: any = { date: { gte: startDate, lte: endDate } };
+  if (profileFilter !== "GENERAL") {
+    expenseWhere.businessProfile = profileFilter;
+  }
+  
+  const expenses = await prisma.expense.findMany({ where: expenseWhere });
   
   const gastos = expenses.reduce((acc, e) => {
     acc.base += e.baseAmount;
@@ -67,7 +74,6 @@ export async function getGestoriaData(period: string = "TRIMESTRE", customStart?
     return acc;
   }, { base: 0, iva: 0, total: 0 });
 
-  // SUMAR COMPRAS Y GASTOS COMO "SOPORTADO"
   const soportado = {
     base: recibidas.base + gastos.base,
     iva: recibidas.iva + gastos.iva,
@@ -85,3 +91,4 @@ export async function getGestoriaData(period: string = "TRIMESTRE", customStart?
     diferenciaIva
   };
 }
+

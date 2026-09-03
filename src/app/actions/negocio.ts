@@ -2,7 +2,7 @@
 import { requireAuth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
-export async function getNegocioDashboard(period: string = "MES", customStart?: string, customEnd?: string) {
+export async function getNegocioDashboard(period: string = "MES", customStart?: string, customEnd?: string, profile?: string) {
   await requireAuth();
   const now = new Date();
   let startDate = new Date();
@@ -144,3 +144,4 @@ export async function getNegocioDashboard(period: string = "MES", customStart?: 
     canales: canalStats
   };
 }
+

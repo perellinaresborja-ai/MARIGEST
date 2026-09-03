@@ -41,19 +41,19 @@ export default function ConfiguracionPage() {
         </Card>
 
         {/* COSTES Y PRODUCTO */}
-        <Card className="border-rose-200">
-          <CardHeader className="bg-rose-50/50">
+        <Card className="border-brand-200">
+          <CardHeader className="bg-brand-50/50">
             <CardTitle>Costes Analíticos</CardTitle>
             <CardDescription>Se utilizan para calcular rentabilidades en el módulo de Negocio. (Valor fijo sin inventario contable).</CardDescription>
           </CardHeader>
           <CardContent className="pt-4 space-y-4">
             <div className="space-y-2">
               <Label>Coste Vermut Rojo (€/botella)</Label>
-              <Input type="number" step="0.01" defaultValue={4.05} className="font-bold text-rose-900" />
+              <Input type="number" step="0.01" defaultValue={4.05} className="font-bold text-brand-900" />
             </div>
             <div className="space-y-2">
               <Label>Coste Vermut Blanco (€/botella)</Label>
-              <Input type="number" step="0.01" defaultValue={4.05} className="font-bold text-rose-900" />
+              <Input type="number" step="0.01" defaultValue={4.05} className="font-bold text-brand-900" />
             </div>
             <div className="space-y-2">
               <Label>Unidades por Caja</Label>

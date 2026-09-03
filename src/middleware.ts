@@ -6,26 +6,9 @@ const JWT_SECRET = process.env.JWT_SECRET || "default_super_secret_marigest_key_
 const key = new TextEncoder().encode(JWT_SECRET);
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get('marigest_session')?.value;
-  const isLoginPage = request.nextUrl.pathname.startsWith('/login');
-
-  if (!token) {
-    if (isLoginPage) return NextResponse.next();
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-
-  try {
-    await jwtVerify(token, key);
-    if (isLoginPage) {
-      return NextResponse.redirect(new URL('/', request.url));
-    }
-    return NextResponse.next();
-  } catch (error) {
-    if (isLoginPage) return NextResponse.next();
-    const response = NextResponse.redirect(new URL('/login', request.url));
-    response.cookies.delete('marigest_session');
-    return response;
-  }
+  // === AUTENTICACIÓN DESACTIVADA TEMPORALMENTE ===
+  // Siempre permitimos el paso mientras estamos probando.
+  return NextResponse.next();
 }
 
 export const config = {

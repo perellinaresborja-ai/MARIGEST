@@ -1,13 +1,15 @@
 import { getNegocioDashboard } from "@/app/actions/negocio";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default async function NegocioPage({ searchParams }: { searchParams: Promise<{ period?: string, start?: string, end?: string }> }) {
+import { GestoriaFilter } from "../gestoria/GestoriaFilter";
+export default async function NegocioPage({ searchParams }: { searchParams: Promise<{ period?: string, start?: string, end?: string, profile?: string }> }) {
   const params = await searchParams;
   const period = params.period || "MES";
   const start = params.start;
   const end = params.end;
+  const profile = params.profile || "GENERAL";
   
-  const data = await getNegocioDashboard(period, start, end);
+  const data = await getNegocioDashboard(period, start, end, profile);
   const { kpis, canales } = data;
 
   return (
@@ -16,6 +18,7 @@ export default async function NegocioPage({ searchParams }: { searchParams: Prom
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Resumen</h1>
           <p className="text-slate-500">Rentabilidad, canales y rendimiento comercial.</p>
+          <GestoriaFilter currentFilter={profile} />
         </div>
         <div className="flex flex-col items-stretch gap-2 w-full md:w-[400px]">
           <div className="flex bg-slate-100 p-1 rounded-lg text-sm w-full">
@@ -41,30 +44,30 @@ export default async function NegocioPage({ searchParams }: { searchParams: Prom
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="bg-emerald-50 border-emerald-100">
+        <Card className="bg-brand-50 border-brand-100">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs uppercase text-emerald-800">Facturación (Base)</CardTitle>
+            <CardTitle className="text-xs uppercase text-brand-800">Facturación (Base)</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-emerald-900">{kpis.facturacion.toFixed(2)} €</p>
+            <p className="text-2xl font-bold text-brand-900">{kpis.facturacion.toFixed(2)} €</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-rose-50 border-rose-100">
+        <Card className="bg-brand-50 border-brand-100">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs uppercase text-rose-800">Coste Producto</CardTitle>
+            <CardTitle className="text-xs uppercase text-brand-800">Coste Producto</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-rose-900">-{kpis.costeProductoVendido.toFixed(2)} €</p>
+            <p className="text-2xl font-bold text-brand-900">-{kpis.costeProductoVendido.toFixed(2)} €</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-rose-50 border-rose-100">
+        <Card className="bg-brand-50 border-brand-100">
           <CardHeader className="pb-2">
-            <CardTitle className="text-xs uppercase text-rose-800">Gastos Generales</CardTitle>
+            <CardTitle className="text-xs uppercase text-brand-800">Gastos Generales</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-2xl font-bold text-rose-900">-{kpis.gastosTotales.toFixed(2)} €</p>
+            <p className="text-2xl font-bold text-brand-900">-{kpis.gastosTotales.toFixed(2)} €</p>
           </CardContent>
         </Card>
 
@@ -133,7 +136,7 @@ export default async function NegocioPage({ searchParams }: { searchParams: Prom
                   <span className="text-slate-500">Margen bruto</span>
                   <span className="font-bold text-emerald-700">{margen.toFixed(2)} €</span>
                 </div>
-                <div className="flex justify-between items-center text-xs text-rose-700">
+                <div className="flex justify-between items-center text-xs text-brand-700">
                   <span>Pendiente cobro</span>
                   <span>{stats.pendiente.toFixed(2)} €</span>
                 </div>

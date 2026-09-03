@@ -127,7 +127,7 @@ export default function EventCloseForm({ event, rojoProduct, blancoProduct, stoc
         </CardHeader>
         <CardContent className="pt-6 grid grid-cols-2 gap-8">
           <div>
-            <h3 className="font-bold text-rose-900 mb-2">Vermut Rojo</h3>
+            <h3 className="font-bold text-brand-900 mb-2">Vermut Rojo</h3>
             <p className="text-sm text-slate-500 mb-4">Salieron: {stockRojo} botellas (~{stockRojo/6} cajas)</p>
             <div className="flex items-center gap-4">
               <Label>Vuelven:</Label>
@@ -137,7 +137,7 @@ export default function EventCloseForm({ event, rojoProduct, blancoProduct, stoc
                 className="text-xl w-32"
               />
             </div>
-            <p className="text-sm font-bold text-rose-700 mt-4">Faltan: {faltanRojo} botellas</p>
+            <p className="text-sm font-bold text-brand-700 mt-4">Faltan: {faltanRojo} botellas</p>
           </div>
           
           <div>
@@ -267,11 +267,11 @@ export default function EventCloseForm({ event, rojoProduct, blancoProduct, stoc
         <CardContent className="pt-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
           <div>
             <p className="text-sm text-slate-500 mb-1">Coste Producto (Est.)</p>
-            <p className="text-xl font-medium text-rose-900">-{estimatedProductCost.toFixed(2)} €</p>
+            <p className="text-xl font-medium text-brand-900">-{estimatedProductCost.toFixed(2)} €</p>
           </div>
           <div>
             <p className="text-sm text-slate-500 mb-1">Otros Gastos</p>
-            <p className="text-xl font-medium text-rose-900">-{totalExpenses.toFixed(2)} €</p>
+            <p className="text-xl font-medium text-brand-900">-{totalExpenses.toFixed(2)} €</p>
           </div>
           <div>
             <p className="text-sm text-slate-500 mb-1">Ingresos</p>
@@ -279,7 +279,7 @@ export default function EventCloseForm({ event, rojoProduct, blancoProduct, stoc
           </div>
           <div className="bg-slate-100 rounded-lg p-2">
             <p className="text-sm text-slate-800 font-bold mb-1">RESULTADO</p>
-            <p className={`text-2xl font-black ${result >= 0 ? 'text-emerald-700' : 'text-rose-900'}`}>
+            <p className={`text-2xl font-black ${result >= 0 ? 'text-emerald-700' : 'text-brand-900'}`}>
               {result > 0 ? '+' : ''}{result.toFixed(2)} €
             </p>
           </div>

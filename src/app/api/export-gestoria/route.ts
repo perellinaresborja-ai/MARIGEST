@@ -49,21 +49,18 @@ export async function GET(request: Request) {
       orderBy: { date: 'asc' }
     });
 
-    const emitidasData = invoices.map(inv => {
-      // Find related transaction to see paid status
-      return {
-        "Nº Factura": inv.number,
-        "Fecha": new Date(inv.date).toLocaleDateString(),
-        "Cliente": inv.order.client.legalName || inv.order.client.commercialName,
-        "Tipo Cliente": inv.order.client.type,
-        "NIF/CIF": inv.order.client.cifNif || "",
-        "Base Imponible": inv.subtotal,
-        "IVA": inv.vat,
-        "Total": inv.total,
-        "Estado": inv.status === "PAID" ? "Cobrada" : "Pendiente",
-        "Vencimiento": new Date(inv.dueDate).toLocaleDateString()
-      };
-    });
+    const emitidasData = invoices.map(inv => ({
+      "Nº Factura": inv.number,
+      "Fecha": new Date(inv.date).toLocaleDateString(),
+      "Cliente": inv.order?.client?.legalName || inv.order?.client?.commercialName || "Cliente Genérico",
+      "Tipo Cliente": inv.order?.client?.type || "-",
+      "NIF/CIF": inv.order?.client?.cifNif || "-",
+      "Base Imponible": inv.subtotal,
+      "IVA": inv.vat,
+      "Total": inv.total,
+      "Estado": inv.status === "PAID" ? "Cobrada" : "Pendiente",
+      "Vencimiento": new Date(inv.dueDate).toLocaleDateString()
+    }));
 
     // 2. FACTURAS RECIBIDAS (Compras + Gastos)
     const purchases = await prisma.purchase.findMany({

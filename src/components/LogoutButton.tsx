@@ -16,7 +16,7 @@ export function LogoutButton() {
   return (
     <button 
       onClick={handleLogout}
-      className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-rose-900 transition-colors ml-4"
+      className="flex items-center gap-2 text-sm font-medium text-slate-500 hover:text-brand-900 transition-colors ml-4"
       title="Cerrar sesión"
     >
       <LogOut className="h-4 w-4" />

@@ -3,9 +3,12 @@ import { getNegocioDashboard } from "@/app/actions/negocio";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
+import { getProfileCookie } from "@/app/actions/profile";
+
 export default async function Home() {
+  const profile = await getProfileCookie();
   const data = await getDashboardData();
-  const negocio = await getNegocioDashboard();
+  const negocio = await getNegocioDashboard("MES", undefined, undefined, profile);
   const maxChartValue = Math.max(...data.chartData.map(d => d.total), 1000); // Para altura proporcional
 
   return (
@@ -40,14 +43,14 @@ export default async function Home() {
           </CardContent>
         </Card>
 
-        <Card className={`shadow-sm ${data.vencidoTotal > 0 ? 'border-rose-300 bg-rose-50/50' : ''}`}>
+        <Card className={`shadow-sm ${data.vencidoTotal > 0 ? 'border-brand-300 bg-brand-50/50' : ''}`}>
           <CardHeader className="p-4 pb-2">
-            <CardTitle className={`text-xs font-medium uppercase ${data.vencidoTotal > 0 ? 'text-rose-800' : 'text-slate-500'}`}>
+            <CardTitle className={`text-xs font-medium uppercase ${data.vencidoTotal > 0 ? 'text-brand-800' : 'text-slate-500'}`}>
               Vencido
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            <p className={`text-2xl font-bold ${data.vencidoTotal > 0 ? 'text-rose-900' : 'text-slate-900'}`}>
+            <p className={`text-2xl font-bold ${data.vencidoTotal > 0 ? 'text-brand-900' : 'text-slate-900'}`}>
               {data.vencidoTotal.toFixed(2)} €
             </p>
           </CardContent>
@@ -76,21 +79,27 @@ export default async function Home() {
         {/* 2. ALERTAS */}
         <div className="lg:col-span-2 space-y-4">
           <h2 className="text-lg font-bold text-slate-800">Necesita Atención</h2>
-          {data.alertas.length === 0 ? (
-            <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-emerald-800 font-medium flex items-center gap-2">
-              <span className="text-xl">✓</span> Todo al día
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {data.alertas.map((alerta, i) => (
-                <div key={i} className={`rounded-xl p-4 border text-sm font-medium ${
-                  alerta.type === 'danger' ? 'bg-rose-50 border-rose-200 text-rose-900' : 'bg-amber-50 border-amber-200 text-amber-900'
-                }`}>
-                  ⚠️ {alerta.message}
+          {(() => {
+            const displayAlerts = profile === "GRANEL_PREMIUM" ? data.alertas.filter((a: any) => !a.message.includes("Vermut")) : data.alertas;
+            if (displayAlerts.length === 0) {
+              return (
+                <div className="bg-brand-50 border border-brand-100 rounded-xl p-4 text-brand-800 font-medium flex items-center gap-2">
+                  <span className="text-xl">✓</span> Todo al día
                 </div>
-              ))}
-            </div>
-          )}
+              );
+            }
+            return (
+              <div className="space-y-2">
+                {displayAlerts.map((alerta: any, i: number) => (
+                  <div key={i} className={`rounded-xl p-4 border text-sm font-medium ${
+                    alerta.type === 'danger' ? 'bg-brand-50 border-brand-200 text-brand-900' : 'bg-amber-50 border-amber-200 text-amber-900'
+                  }`}>
+                    ⚠️ {alerta.message}
+                  </div>
+                ))}
+              </div>
+            );
+          })()}
 
           {/* EVOLUCIÓN (Gráfico) */}
           <Card className="shadow-sm mt-6">
@@ -110,7 +119,7 @@ export default async function Home() {
                       )}
                       <div className="w-full bg-slate-100 rounded-t-sm relative flex items-end" style={{ height: '100%' }}>
                         <div 
-                          className="w-full bg-rose-900 rounded-t-sm transition-all" 
+                          className="w-full bg-brand-900 rounded-t-sm transition-all" 
                           style={{ height: `${height}%` }}
                         ></div>
                       </div>
@@ -125,36 +134,38 @@ export default async function Home() {
 
         {/* 3. STOCK Y PRÓXIMOS COBROS */}
         <div className="space-y-6">
-          <Card className="shadow-sm">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-base">Stock Actual</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {/* Rojo */}
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-bold text-slate-800">Vermut Rojo</span>
-                  <span className="font-bold text-rose-900">{data.rojo.total} ud</span>
+          {profile !== "GRANEL_PREMIUM" && (
+            <Card className="shadow-sm">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-base">Stock Actual</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {/* Rojo */}
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold text-slate-800">Vermut Rojo</span>
+                    <span className="font-bold text-brand-900">{data.rojo.total} ud</span>
+                  </div>
+                  <div className="text-xs text-slate-500 flex justify-between">
+                    <span>Almacén: {data.rojo.almacen}</span>
+                    <span>Eventos: {data.rojo.fuera}</span>
+                  </div>
                 </div>
-                <div className="text-xs text-slate-500 flex justify-between">
-                  <span>Almacén: {data.rojo.almacen}</span>
-                  <span>Eventos: {data.rojo.fuera}</span>
+                <div className="border-t border-slate-100"></div>
+                {/* Blanco */}
+                <div>
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold text-slate-800">Vermut Blanco</span>
+                    <span className="font-bold text-amber-600">{data.blanco.total} ud</span>
+                  </div>
+                  <div className="text-xs text-slate-500 flex justify-between">
+                    <span>Almacén: {data.blanco.almacen}</span>
+                    <span>Eventos: {data.blanco.fuera}</span>
+                  </div>
                 </div>
-              </div>
-              <div className="border-t border-slate-100"></div>
-              {/* Blanco */}
-              <div>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="font-bold text-slate-800">Vermut Blanco</span>
-                  <span className="font-bold text-amber-600">{data.blanco.total} ud</span>
-                </div>
-                <div className="text-xs text-slate-500 flex justify-between">
-                  <span>Almacén: {data.blanco.almacen}</span>
-                  <span>Eventos: {data.blanco.fuera}</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          )}
 
           <Card className="shadow-sm">
             <CardHeader className="pb-2 flex flex-row items-center justify-between">
@@ -175,7 +186,7 @@ export default async function Home() {
                         </div>
                         <div className="text-right">
                           <p className="font-bold">{(c.amount - c.paidAmount).toFixed(2)} €</p>
-                          <span className={`inline-block w-2 h-2 rounded-full ${isOverdue ? 'bg-rose-500' : 'bg-amber-500'}`}></span>
+                          <span className={`inline-block w-2 h-2 rounded-full ${isOverdue ? 'bg-brand-500' : 'bg-amber-500'}`}></span>
                         </div>
                       </div>
                     );
@@ -204,7 +215,7 @@ export default async function Home() {
                     <p className="text-xs text-slate-500">{new Date(order.date).toLocaleString()} • {order.totalBottles} botellas</p>
                   </div>
                   <Link href={`/clientes/${order.clientId}`}>
-                    <span className="text-xs font-medium text-rose-900 hover:underline">Ver</span>
+                    <span className="text-xs font-medium text-brand-900 hover:underline">Ver</span>
                   </Link>
                 </div>
               ))}

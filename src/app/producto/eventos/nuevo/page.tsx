@@ -84,10 +84,10 @@ export default function NuevoEventoPage() {
             <CardDescription>Indica las cajas que salen físicamente hacia el evento.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
-            <div className="flex items-center justify-between p-4 bg-rose-50 rounded-xl border border-rose-100">
+            <div className="flex items-center justify-between p-4 bg-brand-50 rounded-xl border border-brand-100">
               <div>
-                <h3 className="font-bold text-rose-900">Vermut Rojo</h3>
-                <p className="text-sm text-rose-700">Cajas de 6 botellas</p>
+                <h3 className="font-bold text-brand-900">Vermut Rojo</h3>
+                <p className="text-sm text-brand-700">Cajas de 6 botellas</p>
               </div>
               <div className="w-32">
                 <Input type="number" name="boxesRojo" min="0" defaultValue="0" className="text-xl text-center font-bold" />
@@ -106,7 +106,7 @@ export default function NuevoEventoPage() {
           </CardContent>
         </Card>
 
-        <Button type="submit" disabled={loading} className="w-full h-14 text-lg bg-rose-900 hover:bg-rose-800">
+        <Button type="submit" disabled={loading} className="w-full h-14 text-lg bg-brand-900 hover:bg-brand-800">
           {loading ? "Registrando..." : "ENVIAR PRODUCTO"}
         </Button>
       </form>

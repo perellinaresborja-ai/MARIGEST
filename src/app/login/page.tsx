@@ -34,7 +34,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
       <Card className="w-full max-w-[320px] shadow-lg border-0">
         <CardHeader className="space-y-2 flex flex-col items-center pt-8">
-          <img src="/logo.png" alt="MariGest Logo" className="h-16 w-auto mb-4" />
+          <img src="/marigest-logo.png" alt="MariGest Logo" className="h-16 w-auto mb-4" />
           <CardTitle className="text-xl font-bold text-slate-800">Acceso a MariGest</CardTitle>
         </CardHeader>
         <CardContent className="pb-8 px-6">
@@ -92,3 +92,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

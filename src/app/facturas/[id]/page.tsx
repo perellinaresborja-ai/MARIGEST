@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Download, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 import { RefundButton } from "@/components/RefundButton";
@@ -64,7 +64,7 @@ export default async function FacturaViewPage({ params }: { params: Promise<{ id
           <div>
             {/* Logo inyectado */}
             <img src="/cellernazihalogo.jpg" alt="Celler Naziha Logo" className="h-36 w-auto mb-4 -mt-4 object-contain mix-blend-multiply" />
-            <h1 className={`text-3xl font-black tracking-tighter ${invoice.type === 'RECTIFICATIVA' ? 'text-slate-900' : 'text-rose-900'}`}>
+            <h1 className={`text-3xl font-black tracking-tighter ${invoice.type === 'RECTIFICATIVA' ? 'text-slate-900' : 'text-brand-900'}`}>
               {invoice.type === 'RECTIFICATIVA' ? 'FACTURA RECTIFICATIVA' : 'FACTURA'}
             </h1>
             <p className="text-slate-500 font-medium mt-1">Nº {invoice.number}</p>
@@ -87,10 +87,10 @@ export default async function FacturaViewPage({ params }: { params: Promise<{ id
         <div className="mb-12">
           <h3 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-2">Facturado a:</h3>
           <div className="bg-slate-50 p-4 rounded-lg">
-            <p className="font-bold text-lg">{client.legalName || client.commercialName}</p>
-            {client.cifNif && <p className="text-slate-600">CIF/NIF: {client.cifNif}</p>}
-            {client.fiscalAddress && <p className="text-slate-600">{client.fiscalAddress}</p>}
-            {!client.cifNif && !client.fiscalAddress && <p className="text-slate-400 text-sm italic">Faltan datos fiscales en la ficha del cliente.</p>}
+            <p className="font-bold text-lg">{displayClient.legalName || displayClient.commercialName}</p>
+            {displayClient.cifNif && <p className="text-slate-600">CIF/NIF: {displayClient.cifNif}</p>}
+            {displayClient.fiscalAddress && <p className="text-slate-600">{displayClient.fiscalAddress}</p>}
+            {!displayClient.cifNif && !displayClient.fiscalAddress && <p className="text-slate-400 text-sm italic">Faltan datos fiscales en la ficha del cliente.</p>}
           </div>
         </div>
 
@@ -109,7 +109,7 @@ export default async function FacturaViewPage({ params }: { params: Promise<{ id
               <tr key={line.id}>
                 <td className="py-4">
                   <p className="font-bold">{line.description}</p>
-                  {line.unitPrice === 0 && <p className="text-xs text-rose-600">Promoción comercial 100% dto.</p>}
+                  {line.unitPrice === 0 && <p className="text-xs text-brand-600">Promoción comercial 100% dto.</p>}
                 </td>
                 <td className="py-4 text-center">{line.quantity}</td>
                 <td className="py-4 text-right">{line.unitPrice === 0 ? "0.00" : line.unitPrice.toFixed(2)} €</td>
@@ -132,7 +132,7 @@ export default async function FacturaViewPage({ params }: { params: Promise<{ id
             </div>
             <div className="flex justify-between border-t-2 border-slate-900 pt-3">
               <span className="font-black text-xl">TOTAL</span>
-              <span className="font-black text-xl text-rose-900">{invoice.total.toFixed(2)} €</span>
+              <span className={`font-black text-xl ${accentColor}`}>{invoice.total.toFixed(2)} €</span>
             </div>
           </div>
         </div>
@@ -146,7 +146,7 @@ export default async function FacturaViewPage({ params }: { params: Promise<{ id
           </div>
           <div className="text-right">
             <p className="font-bold text-slate-700 mb-1">Condiciones de pago:</p>
-            <p>{client.paymentTerm?.name || 'Al contado'}</p>
+            <p>{displayClient.paymentTerm?.name || 'Al contado'}</p>
           </div>
         </div>
 

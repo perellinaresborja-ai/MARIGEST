@@ -5,8 +5,14 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+enum BusinessProfile {
+  GENERAL
+  VERMUT
+  GRANEL_PREMIUM
 }
 
 enum Role {
@@ -41,6 +47,9 @@ model Client {
   phone           String?
   contactPerson   String?
   type            ClientType
+  isVermut        Boolean     @default(true)
+  isGranelPremium Boolean     @default(false)
+  seedPrices      ClientSeedPrice[]
   
   agreementId     String?
   agreement       CommercialAgreement? @relation(fields: [agreementId], references: [id])
@@ -194,6 +203,7 @@ model Invoice {
   order         Order?   @relation(fields: [orderId], references: [id])
   date          DateTime @default(now())
   
+  businessProfile BusinessProfile @default(VERMUT)
   type          String   @default("NORMAL") // NORMAL, RECTIFICATIVA
   originalInvoiceId String?
   originalInvoice   Invoice?  @relation("Rectificativa", fields: [originalInvoiceId], references: [id])
@@ -236,6 +246,7 @@ enum TransactionStatus {
 
 model Transaction {
   id            String            @id @default(uuid())
+  businessProfile BusinessProfile @default(VERMUT)
   type          TransactionType
   status        TransactionStatus @default(PENDING)
   amount        Float             // Total original amount
@@ -295,6 +306,7 @@ model Expense {
   dueDate       DateTime?
   date          DateTime @default(now())
   
+  businessProfile BusinessProfile @default(GENERAL)
   eventId       String?
   event         Event?   @relation(fields: [eventId], references: [id])
 }
@@ -310,3 +322,25 @@ model Event {
   locationId    String?   @unique
   location      Location? @relation(fields: [locationId], references: [id])
 }
+
+model SeedProduct {
+  id        String   @id @default(uuid())
+  reference String   @unique
+  name      String
+  vat       Float    @default(21)
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  prices    ClientSeedPrice[]
+}
+
+model ClientSeedPrice {
+  id             String      @id @default(uuid())
+  clientId       String
+  client         Client      @relation(fields: [clientId], references: [id])
+  seedProductId  String
+  seedProduct    SeedProduct @relation(fields: [seedProductId], references: [id])
+  price          Float
+  
+  @@unique([clientId, seedProductId])
+}
+

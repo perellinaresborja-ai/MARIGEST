@@ -61,7 +61,7 @@ export default function NuevoMovimientoPage() {
 
   const movementTypes = [
     { value: "BOTTLING", label: "Entrada Embotelladora", color: "text-emerald-700" },
-    { value: "BREAKAGE", label: "Rotura", color: "text-rose-700" },
+    { value: "BREAKAGE", label: "Rotura", color: "text-brand-700" },
     { value: "SHRINKAGE", label: "Merma", color: "text-amber-700" },
     { value: "SAMPLE", label: "Muestra", color: "text-blue-700" },
     { value: "PROMOTION", label: "Promoción Comercial", color: "text-purple-700" },

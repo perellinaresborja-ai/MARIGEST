@@ -11,7 +11,7 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
   const client = await prisma.client.findUnique({
     where: { id },
     include: {
-      agreement: true,
+      agreement: true, seedPrices: { include: { seedProduct: true } },
       paymentTerm: true,
       transactions: {
         where: { type: "RECEIVABLE" },
@@ -115,22 +115,22 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
             <p className="text-3xl font-bold">{client.transactions.reduce((sum, t) => sum + (t.amount - t.paidAmount), 0).toFixed(2)} €</p>
           </CardContent>
         </Card>
-        <Card className="bg-rose-50 border-rose-100">
+        <Card className="bg-brand-50 border-brand-100">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-rose-800 uppercase">Vencido</CardTitle>
+            <CardTitle className="text-sm text-brand-800 uppercase">Vencido</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-rose-900">
+            <p className="text-3xl font-bold text-brand-900">
               {client.transactions.filter(t => (t.amount - t.paidAmount) > 0 && new Date(t.dueDate) < new Date()).reduce((sum, t) => sum + (t.amount - t.paidAmount), 0).toFixed(2)} €
             </p>
           </CardContent>
         </Card>
-        <Card className="bg-emerald-50 border-emerald-100">
+        <Card className="bg-brand-50 border-brand-100">
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-emerald-800 uppercase">Pagado / Histórico</CardTitle>
+            <CardTitle className="text-sm text-brand-800 uppercase">Pagado / Histórico</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-bold text-emerald-900">
+            <p className="text-3xl font-bold text-brand-900">
               {client.transactions.reduce((sum, t) => sum + t.paidAmount, 0).toFixed(2)} €
             </p>
           </CardContent>
@@ -156,11 +156,11 @@ export default async function ClientProfilePage({ params }: { params: Promise<{ 
                     <p className="font-bold">{order.invoice?.total.toFixed(2)} €</p>
                     {order.transactions && order.transactions.length > 0 ? (
                       order.transactions[0].status === "PAID" ? (
-                        <span className="text-xs text-emerald-900 bg-emerald-50 px-2 py-1 rounded">Cobrado</span>
+                        <span className="text-xs text-brand-900 bg-brand-50 px-2 py-1 rounded">Cobrado</span>
                       ) : order.transactions[0].status === "PARTIAL" ? (
                         <span className="text-xs text-amber-900 bg-amber-50 px-2 py-1 rounded">Parcial</span>
                       ) : (
-                        <span className="text-xs text-rose-900 bg-rose-50 px-2 py-1 rounded">Pendiente</span>
+                        <span className="text-xs text-brand-900 bg-brand-50 px-2 py-1 rounded">Pendiente</span>
                       )
                     ) : (
                       <span className="text-xs text-slate-500 bg-slate-50 px-2 py-1 rounded">Sin transacción</span>

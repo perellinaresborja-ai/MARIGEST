@@ -42,12 +42,13 @@ export function SplashScreen() {
     >
       <div className="flex flex-col items-center gap-6">
         <img 
-          src="/logo.png" 
+          src="/marigest-logo.png" 
           alt="MariGest Logo" 
           className="w-48 h-auto animate-pulse"
         />
-        <div className="w-8 h-8 border-4 border-rose-900 border-t-transparent rounded-full animate-spin"></div>
+        <div className="w-8 h-8 border-4 border-brand-900 border-t-transparent rounded-full animate-spin"></div>
       </div>
     </div>
   );
 }
+

@@ -44,8 +44,8 @@ export default async function CobrosPage() {
                 const isVencido = new Date(t.dueDate) < now && pending > 0;
                 
                 return (
-                  <TableRow key={t.id} className={isVencido ? 'bg-rose-50/20' : ''}>
-                    <TableCell className={isVencido ? 'text-rose-700 font-bold' : ''}>
+                  <TableRow key={t.id} className={isVencido ? 'bg-brand-50/20' : ''}>
+                    <TableCell className={isVencido ? 'text-brand-700 font-bold' : ''}>
                       {new Date(t.dueDate).toLocaleDateString()}
                     </TableCell>
                     <TableCell className="font-medium">{t.client?.commercialName}</TableCell>
@@ -55,7 +55,7 @@ export default async function CobrosPage() {
                       ) : t.status === "PARTIAL" ? (
                         <span className="bg-amber-100 text-amber-800 px-2 py-1 rounded text-xs font-bold">PARCIAL</span>
                       ) : isVencido ? (
-                        <span className="bg-rose-100 text-rose-800 px-2 py-1 rounded text-xs font-bold">VENCIDO</span>
+                        <span className="bg-brand-100 text-brand-800 px-2 py-1 rounded text-xs font-bold">VENCIDO</span>
                       ) : (
                         <span className="bg-slate-100 text-slate-800 px-2 py-1 rounded text-xs font-bold">PENDIENTE</span>
                       )}

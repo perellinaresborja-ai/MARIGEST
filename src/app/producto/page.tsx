@@ -1,11 +1,18 @@
 import { getStockOverview } from "@/lib/stock";
 import { getStockMovements } from "@/app/actions/stock";
+import { getProfileCookie } from "@/app/actions/profile";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
+import { ProductoGranel } from "./components/ProductoGranel";
 
 export default async function ProductoPage() {
+  const profile = await getProfileCookie();
+  if (profile === "GRANEL_PREMIUM") {
+    return <ProductoGranel />;
+  }
+
   const stock = await getStockOverview();
   const rojo = stock.find((s) => s.type === "ROJO");
   const blanco = stock.find((s) => s.type === "BLANCO");
@@ -39,7 +46,7 @@ export default async function ProductoPage() {
           <p className="text-slate-400 font-medium">Control de almacén, embotelladora y eventos.</p>
         </div>
         <Link href="/producto/nuevo">
-          <Button className="bg-rose-600 hover:bg-rose-500 text-white shadow-lg h-12 px-6">
+          <Button className="bg-brand-600 hover:bg-brand-500 text-white shadow-lg h-12 px-6">
             <Plus className="w-5 h-5 mr-2" />
             NUEVO MOVIMIENTO
           </Button>
@@ -48,11 +55,11 @@ export default async function ProductoPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* ROJO */}
-        <Card className="border-rose-100 shadow-sm">
-          <CardHeader className="bg-rose-50/50 pb-4">
+        <Card className="border-brand-100 shadow-sm">
+          <CardHeader className="bg-brand-50/50 pb-4">
             <div className="flex justify-between items-center">
-              <CardTitle className="text-rose-900">Vermut Rojo</CardTitle>
-              <span className="text-2xl font-bold text-rose-900">{rojo?.total || 0} ud</span>
+              <CardTitle className="text-brand-900">Vermut Rojo</CardTitle>
+              <span className="text-2xl font-bold text-brand-900">{rojo?.total || 0} ud</span>
             </div>
           </CardHeader>
           <CardContent className="pt-6">
@@ -128,11 +135,11 @@ export default async function ProductoPage() {
                         <td className="px-4 py-3 text-slate-500">{new Date(mov.date).toLocaleString()}</td>
                         <td className="px-4 py-3 font-medium">{getTypeLabel(mov.type)}</td>
                         <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded text-xs font-bold ${mov.product.type === 'ROJO' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}`}>
+                          <span className={`px-2 py-1 rounded text-xs font-bold ${mov.product.type === 'ROJO' ? 'bg-brand-100 text-brand-800' : 'bg-amber-100 text-amber-800'}`}>
                             {mov.product.name}
                           </span>
                         </td>
-                        <td className={`px-4 py-3 text-right font-bold ${isPositive ? 'text-emerald-600' : 'text-rose-600'}`}>
+                        <td className={`px-4 py-3 text-right font-bold ${isPositive ? 'text-emerald-600' : 'text-brand-600'}`}>
                           {isPositive ? '+' : '-'}{mov.quantity}
                         </td>
                         <td className="px-4 py-3 text-right text-slate-500">{mov.stockAfter}</td>

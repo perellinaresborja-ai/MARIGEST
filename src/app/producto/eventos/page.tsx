@@ -20,7 +20,7 @@ export default async function EventosPage() {
           <p className="text-slate-500">Mueve producto temporalmente a una ubicación.</p>
         </div>
         <Link href="/producto/eventos/nuevo">
-          <Button className="bg-rose-900 hover:bg-rose-800 text-white">Nuevo Evento</Button>
+          <Button className="bg-brand-900 hover:bg-brand-800 text-white">Nuevo Evento</Button>
         </Link>
       </div>
 
@@ -33,15 +33,15 @@ export default async function EventosPage() {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {openEvents.map(e => (
-              <Card key={e.id} className="border-rose-200 shadow-sm hover:shadow-md transition-shadow">
+              <Card key={e.id} className="border-brand-200 shadow-sm hover:shadow-md transition-shadow">
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-base text-rose-900">{e.name}</CardTitle>
+                  <CardTitle className="text-base text-brand-900">{e.name}</CardTitle>
                   <p className="text-sm text-slate-500">{e.place}</p>
                 </CardHeader>
                 <CardContent>
                   <p className="text-xs font-medium text-slate-500 mb-4">{new Date(e.date).toLocaleDateString()}</p>
                   <Link href={`/producto/eventos/${e.id}/cierre`}>
-                    <Button variant="outline" className="w-full text-rose-900 border-rose-200 hover:bg-rose-50">Gestionar Cierre</Button>
+                    <Button variant="outline" className="w-full text-brand-900 border-brand-200 hover:bg-brand-50">Gestionar Cierre</Button>
                   </Link>
                 </CardContent>
               </Card>

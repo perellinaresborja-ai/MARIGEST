@@ -1,13 +1,14 @@
 "use client";
 
 import { createClient } from "@/app/actions/clients";
+import { getProfileCookie } from "@/app/actions/profile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 export default function NuevoClientePage() {
@@ -16,6 +17,13 @@ export default function NuevoClientePage() {
   const [type, setType] = useState("HOSTELERIA");
   const [paymentTermDays, setPaymentTermDays] = useState("0");
   const [agreementType, setAgreementType] = useState("NONE");
+  const [isGranel, setIsGranel] = useState(false);
+
+  useEffect(() => {
+    getProfileCookie().then(profile => {
+      setIsGranel(profile === "GRANEL_PREMIUM");
+    });
+  }, []);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -138,51 +146,53 @@ export default function NuevoClientePage() {
               </Select>
             </div>
 
-            <div className="space-y-4 pt-4 border-t">
-              <Label>Acuerdo Comercial Permanente</Label>
-              <Select name="agreementType" value={agreementType} onValueChange={setAgreementType}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Sin acuerdo" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="NONE">Sin acuerdo especial (Aplica tarifa base)</SelectItem>
-                  <SelectItem value="PROMO_X_Y">Promoción X + Y (Ej: 12 + 2)</SelectItem>
-                  <SelectItem value="DISCOUNT_PERCENT">Descuento Global (%)</SelectItem>
-                  <SelectItem value="SPECIAL_PRICE">Precio Especial Fijo (€)</SelectItem>
-                  <SelectItem value="MANUAL">Otro (Manual)</SelectItem>
-                </SelectContent>
-              </Select>
+            {!isGranel && (
+              <div className="space-y-4 pt-4 border-t">
+                <Label>Acuerdo Comercial Permanente</Label>
+                <Select name="agreementType" value={agreementType} onValueChange={setAgreementType}>
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sin acuerdo" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="NONE">Sin acuerdo especial (Aplica tarifa base)</SelectItem>
+                    <SelectItem value="PROMO_X_Y">Promoción X + Y (Ej: 12 + 2)</SelectItem>
+                    <SelectItem value="DISCOUNT_PERCENT">Descuento Global (%)</SelectItem>
+                    <SelectItem value="SPECIAL_PRICE">Precio Especial Fijo (€)</SelectItem>
+                    <SelectItem value="MANUAL">Otro (Manual)</SelectItem>
+                  </SelectContent>
+                </Select>
 
-              {agreementType === "PROMO_X_Y" && (
-                <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-md border">
-                  <div className="space-y-1">
-                    <Label className="text-xs">Por cada (X) botellas</Label>
-                    <Input name="paramX" type="number" placeholder="Ej: 12" className="w-24" />
+                {agreementType === "PROMO_X_Y" && (
+                  <div className="flex items-center gap-4 bg-slate-50 p-4 rounded-md border">
+                    <div className="space-y-1">
+                      <Label className="text-xs">Por cada (X) botellas</Label>
+                      <Input name="paramX" type="number" placeholder="Ej: 12" className="w-24" />
+                    </div>
+                    <span className="text-2xl font-light text-slate-400 mt-4">+</span>
+                    <div className="space-y-1">
+                      <Label className="text-xs">Regalamos (Y)</Label>
+                      <Input name="paramY" type="number" placeholder="Ej: 2" className="w-24" />
+                    </div>
                   </div>
-                  <span className="text-2xl font-light text-slate-400 mt-4">+</span>
-                  <div className="space-y-1">
-                    <Label className="text-xs">Regalamos (Y)</Label>
-                    <Input name="paramY" type="number" placeholder="Ej: 2" className="w-24" />
+                )}
+                
+                {agreementType === "DISCOUNT_PERCENT" && (
+                  <div className="bg-slate-50 p-4 rounded-md border w-48">
+                    <Label className="text-xs">Porcentaje de descuento</Label>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Input name="paramFloat" type="number" step="0.1" placeholder="10" />
+                      <span className="text-slate-500">%</span>
+                    </div>
                   </div>
-                </div>
-              )}
-              
-              {agreementType === "DISCOUNT_PERCENT" && (
-                <div className="bg-slate-50 p-4 rounded-md border w-48">
-                  <Label className="text-xs">Porcentaje de descuento</Label>
-                  <div className="flex items-center gap-2 mt-1">
-                    <Input name="paramFloat" type="number" step="0.1" placeholder="10" />
-                    <span className="text-slate-500">%</span>
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </CardContent>
         </Card>
 
         <div className="flex justify-end gap-4">
           <Button type="button" variant="outline" onClick={() => router.back()}>Cancelar</Button>
-          <Button type="submit" disabled={loading} className="bg-rose-900 hover:bg-rose-800 text-white">
+          <Button type="submit" disabled={loading} className="bg-brand-900 hover:bg-brand-800 text-white">
             {loading ? "Guardando..." : "Guardar Cliente"}
           </Button>
         </div>

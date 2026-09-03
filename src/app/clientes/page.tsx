@@ -1,21 +1,30 @@
-import { getClients } from "@/app/actions/clients";
+﻿import { getClients } from "@/app/actions/clients";
+import { getProfileCookie } from "@/app/actions/profile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Link from "next/link";
 
 export default async function ClientesPage() {
-  const clients = await getClients();
+  const currentProfile = await getProfileCookie();
+  
+  let clients = await getClients();
+  
+  if (currentProfile === "GRANEL_PREMIUM") {
+    clients = clients.filter((c: any) => c.isGranelPremium);
+  } else {
+    clients = clients.filter((c: any) => c.isVermut !== false);
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Clientes</h1>
-          <p className="text-slate-500">Inteligencia comercial y gestión de cartera.</p>
+          <p className="text-slate-500 mb-4">Inteligencia comercial y gestiÃ³n de cartera.</p>
         </div>
         <Link href="/clientes/nuevo">
-          <Button className="bg-rose-900 hover:bg-rose-800 text-white">Nuevo Cliente</Button>
+          <Button className="bg-brand-900 hover:bg-brand-800 text-white">Nuevo Cliente</Button>
         </Link>
       </div>
 
@@ -26,8 +35,8 @@ export default async function ClientesPage() {
               <TableRow>
                 <TableHead>Nombre Comercial</TableHead>
                 <TableHead>Tipo</TableHead>
+                <TableHead>Perfil</TableHead>
                 <TableHead>Contacto</TableHead>
-                <TableHead>Acuerdo</TableHead>
                 <TableHead className="text-right">Acciones</TableHead>
               </TableRow>
             </TableHeader>
@@ -35,30 +44,27 @@ export default async function ClientesPage() {
               {clients.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={5} className="text-center py-8 text-slate-500">
-                    No hay clientes registrados. Empieza creando uno.
+                    No hay clientes para este filtro.
                   </TableCell>
                 </TableRow>
               ) : (
-                clients.map((c) => (
+                clients.map((c: any) => (
                   <TableRow key={c.id}>
                     <TableCell className="font-medium">{c.commercialName}</TableCell>
-                    <TableCell>{c.type === 'HOSTELERIA' ? 'Hostelería' : c.type === 'DISTRIBUIDOR' ? 'Distribuidor' : 'Particular'}</TableCell>
+                    <TableCell>{c.type === 'HOSTELERIA' ? 'HostelerÃ­a' : c.type === 'DISTRIBUIDOR' ? 'Distribuidor' : 'Particular'}</TableCell>
+                    <TableCell>
+                      <div className="flex gap-1">
+                        {c.isVermut && <span className="bg-brand-100 text-brand-800 text-[10px] px-1.5 py-0.5 rounded font-bold">PC</span>}
+                        {c.isGranelPremium && <span className="bg-emerald-100 text-emerald-800 text-[10px] px-1.5 py-0.5 rounded font-bold">GP</span>}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       {c.contactPerson && <div className="text-sm">{c.contactPerson}</div>}
                       {c.phone && <div className="text-xs text-slate-500">{c.phone}</div>}
                     </TableCell>
-                    <TableCell>
-                      {c.agreement ? (
-                        <span className="inline-flex items-center rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-700 ring-1 ring-inset ring-amber-600/20">
-                          {c.agreement.name}
-                        </span>
-                      ) : (
-                        <span className="text-slate-400 text-xs">Sin acuerdo</span>
-                      )}
-                    </TableCell>
                     <TableCell className="text-right">
                       <Link href={`/clientes/${c.id}`}>
-                        <Button variant="ghost" size="sm" className="text-rose-900">Ver Ficha</Button>
+                        <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-900">Ver Ficha</Button>
                       </Link>
                     </TableCell>
                   </TableRow>
@@ -71,3 +77,4 @@ export default async function ClientesPage() {
     </div>
   );
 }
+

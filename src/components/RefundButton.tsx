@@ -74,13 +74,13 @@ export function RefundButton({ invoiceId, lines }: { invoiceId: string, lines: a
               })}
             </div>
 
-            <div className="flex items-center gap-2 mb-6 p-3 bg-rose-50 rounded text-rose-900 border border-rose-100">
+            <div className="flex items-center gap-2 mb-6 p-3 bg-brand-50 rounded text-brand-900 border border-brand-100">
               <input 
                 type="checkbox" 
                 id="returnStock" 
                 checked={returnStock} 
                 onChange={(e) => setReturnStock(e.target.checked)}
-                className="w-5 h-5 accent-rose-700"
+                className="w-5 h-5 accent-brand-700"
               />
               <label htmlFor="returnStock" className="text-sm font-medium cursor-pointer">
                 ¿La mercancía abonada vuelve físicamente al almacén? (Suma stock)

@@ -25,14 +25,30 @@ export async function verifyToken(token: string) {
 export async function getSession() {
   const cookieStore = await cookies();
   const token = cookieStore.get("marigest_session")?.value;
-  if (!token) return null;
-  return await verifyToken(token);
+
+  if (!token) {
+    return null;
+  }
+
+  const payload = await verifyToken(token);
+  if (!payload) {
+    return null;
+  }
+
+  return { 
+    id: "admin-id", 
+    email: payload.email as string, 
+    name: "Mari", 
+    role: payload.role as string 
+  };
 }
 
 export async function requireAuth() {
   const session = await getSession();
+  
   if (!session) {
-    throw new Error("No autenticado"); // Throwing error is safer for server actions than direct redirect to avoid NEXT_REDIRECT interference in try-catches.
+    redirect("/login");
   }
+  
   return session;
 }

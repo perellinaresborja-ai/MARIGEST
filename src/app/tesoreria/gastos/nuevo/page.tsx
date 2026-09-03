@@ -157,8 +157,8 @@ export default function NuevoGastoPage() {
           </CardContent>
         </Card>
 
-        <Card className="shadow-sm border-emerald-100">
-          <CardHeader className="bg-emerald-50/30">
+        <Card className="shadow-sm border-brand-100">
+          <CardHeader className="bg-brand-50/30">
             <CardTitle>Estado del Pago</CardTitle>
             <CardDescription>¿Has pagado ya este gasto o queda pendiente?</CardDescription>
           </CardHeader>

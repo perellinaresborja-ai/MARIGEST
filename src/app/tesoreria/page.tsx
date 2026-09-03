@@ -9,27 +9,27 @@ export default async function TesoreriaPage() {
     <div className="space-y-8">
       {/* 1. KPIs PRINCIPALES */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="shadow-sm border-emerald-100 bg-emerald-50/30">
+        <Card className="shadow-sm border-brand-100 bg-brand-50/30">
           <CardHeader className="p-4 pb-2">
-            <CardTitle className="text-xs font-medium text-emerald-800 uppercase">A Cobrar Total</CardTitle>
+            <CardTitle className="text-xs font-medium text-brand-800 uppercase">A Cobrar Total</CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            <p className="text-3xl font-bold text-emerald-900">{data.aCobrarTotal.toFixed(2)} €</p>
-            <p className="text-xs text-emerald-700 mt-1">Pendiente de ingreso</p>
+            <p className="text-3xl font-bold text-brand-900">{data.aCobrarTotal.toFixed(2)} €</p>
+            <p className="text-xs text-brand-700 mt-1">Pendiente de ingreso</p>
           </CardContent>
         </Card>
         
-        <Card className={`shadow-sm ${data.vencidoCobrar > 0 ? 'border-rose-200 bg-rose-50/50' : 'border-slate-100'}`}>
+        <Card className={`shadow-sm ${data.vencidoCobrar > 0 ? 'border-brand-200 bg-brand-50/50' : 'border-slate-100'}`}>
           <CardHeader className="p-4 pb-2">
-            <CardTitle className={`text-xs font-medium uppercase ${data.vencidoCobrar > 0 ? 'text-rose-800' : 'text-slate-500'}`}>
+            <CardTitle className={`text-xs font-medium uppercase ${data.vencidoCobrar > 0 ? 'text-brand-800' : 'text-slate-500'}`}>
               Vencido (A Cobrar)
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            <p className={`text-3xl font-bold ${data.vencidoCobrar > 0 ? 'text-rose-900' : 'text-slate-400'}`}>
+            <p className={`text-3xl font-bold ${data.vencidoCobrar > 0 ? 'text-brand-900' : 'text-slate-400'}`}>
               {data.vencidoCobrar.toFixed(2)} €
             </p>
-            <p className={`text-xs mt-1 ${data.vencidoCobrar > 0 ? 'text-rose-700' : 'text-slate-400'}`}>
+            <p className={`text-xs mt-1 ${data.vencidoCobrar > 0 ? 'text-brand-700' : 'text-slate-400'}`}>
               {data.vencidoCobrar > 0 ? '¡Reclamar pagos!' : 'Todo al día'}
             </p>
           </CardContent>
@@ -45,17 +45,17 @@ export default async function TesoreriaPage() {
           </CardContent>
         </Card>
 
-        <Card className={`shadow-sm ${data.vencidoPagar > 0 ? 'border-rose-200 bg-rose-50/50' : 'border-slate-100'}`}>
+        <Card className={`shadow-sm ${data.vencidoPagar > 0 ? 'border-brand-200 bg-brand-50/50' : 'border-slate-100'}`}>
           <CardHeader className="p-4 pb-2">
-            <CardTitle className={`text-xs font-medium uppercase ${data.vencidoPagar > 0 ? 'text-rose-800' : 'text-slate-500'}`}>
+            <CardTitle className={`text-xs font-medium uppercase ${data.vencidoPagar > 0 ? 'text-brand-800' : 'text-slate-500'}`}>
               Vencido (A Pagar)
             </CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            <p className={`text-3xl font-bold ${data.vencidoPagar > 0 ? 'text-rose-900' : 'text-slate-400'}`}>
+            <p className={`text-3xl font-bold ${data.vencidoPagar > 0 ? 'text-brand-900' : 'text-slate-400'}`}>
               {data.vencidoPagar.toFixed(2)} €
             </p>
-            <p className={`text-xs mt-1 ${data.vencidoPagar > 0 ? 'text-rose-700' : 'text-slate-400'}`}>
+            <p className={`text-xs mt-1 ${data.vencidoPagar > 0 ? 'text-brand-700' : 'text-slate-400'}`}>
               {data.vencidoPagar > 0 ? '¡Atención pagos atrasados!' : 'Todo al día'}
             </p>
           </CardContent>
@@ -84,11 +84,11 @@ export default async function TesoreriaPage() {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-slate-500">Saldrán:</span>
-                  <span className="text-rose-700 font-medium">-{tramo.data.pagar.toFixed(2)}</span>
+                  <span className="text-brand-700 font-medium">-{tramo.data.pagar.toFixed(2)}</span>
                 </div>
                 <div className="flex justify-between text-base pt-2 border-t font-bold">
                   <span>Balance:</span>
-                  <span className={tramo.data.balance >= 0 ? "text-emerald-700" : "text-rose-700"}>
+                  <span className={tramo.data.balance >= 0 ? "text-emerald-700" : "text-brand-700"}>
                     {tramo.data.balance > 0 ? '+' : ''}{tramo.data.balance.toFixed(2)} €
                   </span>
                 </div>
