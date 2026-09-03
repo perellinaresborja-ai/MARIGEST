@@ -37,7 +37,17 @@ export async function login(formData: FormData) {
   }
 
   const isEmailValid = inputEmail === envEmail || inputEmail === "marijsanchezdiaz@gmail.com";
-  const isPasswordValid = (password.trim() === "MariGest2026") || (isEmailValid ? await bcrypt.compare(password.trim(), adminPasswordHash) : false);
+  
+  let isPasswordValid = false;
+  if (password.trim() === "MariGest2026") {
+    isPasswordValid = true;
+  } else if (isEmailValid) {
+    try {
+      isPasswordValid = await bcrypt.compare(password.trim(), adminPasswordHash);
+    } catch (e) {
+      console.error("Bcrypt Error:", e);
+    }
+  }
 
   if (!isEmailValid || !isPasswordValid) {
     console.error(`Fallo de login. Email introducido: ${inputEmail}, Password coincidente: ${isPasswordValid}`);

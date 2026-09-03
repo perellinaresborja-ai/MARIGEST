@@ -19,13 +19,19 @@ export default function LoginPage() {
     setError("");
 
     const formData = new FormData(e.currentTarget);
-    const result = await login(formData);
+    try {
+      const result = await login(formData);
 
-    if (result.success) {
-      router.push("/");
-      router.refresh(); // Refresh router to update middleware and layouts
-    } else {
-      setError(result.error || "Error al iniciar sesión");
+      if (result.success) {
+        router.push("/");
+        router.refresh(); // Refresh router to update middleware and layouts
+      } else {
+        setError(result.error || "Error al iniciar sesión");
+        setLoading(false);
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError("Error interno: " + (err?.message || String(err)));
       setLoading(false);
     }
   }
