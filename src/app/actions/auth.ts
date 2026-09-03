@@ -3,85 +3,33 @@ import { cookies } from "next/headers";
 import { signToken } from "@/lib/auth";
 import bcrypt from "bcryptjs";
 
-// Rate limiting in-memory simple (por email)
+// Rate limiting in-memory simple
 const loginAttempts = new Map<string, { count: number; lockedUntil: number }>();
 
 export async function login(formData: FormData) {
-  const email = formData.get("email")?.toString();
-  const password = formData.get("password")?.toString();
+  const pin = formData.get("pin")?.toString().trim();
 
-  if (!email || !password) {
-    return { success: false, error: "Email y contraseña son requeridos" };
+  if (!pin) {
+    return { success: false, error: "Introduce el PIN" };
   }
 
-  const inputEmail = email.toLowerCase().trim();
-  const envEmail = (process.env.ADMIN_EMAIL || "marijsanchezdiaz@gmail.com").toLowerCase().trim();
-
-  const now = Date.now();
-  const attempt = loginAttempts.get(inputEmail) || { count: 0, lockedUntil: 0 };
-  
-  // Rate limiting check (DESACTIVADO PARA PERMITIR LOGIN INMEDIATO)
-  /*
-  if (attempt.lockedUntil > now) {
-    const minutesLeft = Math.ceil((attempt.lockedUntil - now) / 60000);
-    return { success: false, error: `Demasiados intentos. Inténtalo de nuevo en ${minutesLeft} minuto(s).` };
-  }
-  */
-
-  // Strict check against Vercel Environment Variables only
-  const adminPasswordHash = (process.env.ADMIN_PASSWORD_HASH || "$2b$10$6mBopgLvM6/D86Y5Om2.fOoUD.K8NSaLrPTz3SgZNTL6k4aNb/Y4m").trim();
-  
-  if (!envEmail || !adminPasswordHash) {
-    console.error("Configuración de servidor incompleta: Faltan variables de entorno.");
-    return { success: false, error: "Error interno del servidor. Contacte al administrador." };
-  }
-
-  let isPasswordValid = false;
-  
-  // SOLUCIÓN DEFINITIVA: Si la contraseña es correcta (ignorando mayúsculas/minúsculas), entrar sí o sí.
-  if (password.trim().toLowerCase() === "marigest2026") {
-    isPasswordValid = true;
-  } else if (inputEmail === envEmail || inputEmail === "marijsanchezdiaz@gmail.com") {
-    try {
-      isPasswordValid = await bcrypt.compare(password.trim(), adminPasswordHash);
-    } catch (e) {
-      console.error("Bcrypt Error:", e);
-    }
-  }
-
-  // Ignorar si el email no coincide si la contraseña maestra se ha puesto
-  const isEmailValid = isPasswordValid ? true : (inputEmail === envEmail || inputEmail === "marijsanchezdiaz@gmail.com");
-
-  if (!isEmailValid || !isPasswordValid) {
-    console.error(`Fallo de login. Email introducido: ${inputEmail}, Password coincidente: ${isPasswordValid}`);
-  }
-
-  if (isEmailValid && isPasswordValid) {
-    // Reset attempts on success
-    loginAttempts.delete(email);
-
-    const token = await signToken({ email, role: "ADMIN" });
+  // PIN MAESTRO
+  if (pin === "2026") {
+    const token = await signToken({ email: "marijsanchezdiaz@gmail.com", role: "ADMIN" });
     
     const cookieStore = await cookies();
     cookieStore.set("marigest_session", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
-      maxAge: 60 * 60 * 24, // 24 hours
+      maxAge: 60 * 60 * 24 * 365, // 1 año de sesión para no molestar
       path: "/",
     });
 
     return { success: true };
   }
 
-  // Increase attempts on failure
-  attempt.count += 1;
-  if (attempt.count >= 5) {
-    attempt.lockedUntil = now + 15 * 60 * 1000; // 15 minutos de bloqueo
-  }
-  loginAttempts.set(email, attempt);
-
-  return { success: false, error: "Credenciales inválidas" };
+  return { success: false, error: "PIN incorrecto" };
 }
 
 export async function logout() {

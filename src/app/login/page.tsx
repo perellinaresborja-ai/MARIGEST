@@ -5,13 +5,11 @@ import { useRouter } from "next/navigation";
 import { login } from "@/app/actions/auth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -24,59 +22,40 @@ export default function LoginPage() {
 
       if (result.success) {
         router.push("/");
-        router.refresh(); // Refresh router to update middleware and layouts
+        router.refresh();
       } else {
-        setError(result.error || "Error al iniciar sesión");
+        setError(result.error || "PIN incorrecto");
         setLoading(false);
       }
     } catch (err: any) {
       console.error(err);
-      setError("Error interno: " + (err?.message || String(err)));
+      setError("Error interno del servidor. Reintenta.");
       setLoading(false);
     }
   }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-      <Card className="w-full max-w-[320px] shadow-lg border-0">
+      <Card className="w-full max-w-[320px] shadow-lg border-0 text-center">
         <CardHeader className="space-y-2 flex flex-col items-center pt-8">
           <img src="/marigest-logo.png" alt="MariGest Logo" className="h-16 w-auto mb-4" />
-          <CardTitle className="text-xl font-bold text-slate-800">Acceso a MariGest</CardTitle>
+          <CardTitle className="text-xl font-bold text-slate-800">Desbloquear</CardTitle>
+          <p className="text-sm text-slate-500">Introduce tu PIN de acceso</p>
         </CardHeader>
         <CardContent className="pb-8 px-6">
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="email">
-                Email / Usuario
-              </label>
               <input
-                id="email"
-                name="email"
-                type="text"
+                id="pin"
+                name="pin"
+                type="password"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                maxLength={4}
                 required
-                className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-rose-500"
+                className="w-full px-4 py-4 text-center tracking-[1em] text-3xl font-bold border rounded-lg focus:outline-none focus:ring-2 focus:ring-rose-900 bg-slate-100"
+                placeholder="••••"
               />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-slate-700" htmlFor="password">
-                Contraseña
-              </label>
-              <div className="relative">
-                <input
-                  id="password"
-                  name="password"
-                  type={showPassword ? "text" : "password"}
-                  required
-                  className="w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-rose-500 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
-                >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
-                </button>
-              </div>
             </div>
             
             {error && (
@@ -87,10 +66,10 @@ export default function LoginPage() {
             
             <Button 
               type="submit" 
-              className="w-full bg-rose-900 hover:bg-rose-800 text-white mt-4"
+              className="w-full bg-rose-900 hover:bg-rose-800 text-white py-6 text-lg rounded-lg"
               disabled={loading}
             >
-              {loading ? "Entrando..." : "Entrar"}
+              {loading ? "Comprobando..." : "Entrar"}
             </Button>
           </form>
         </CardContent>
