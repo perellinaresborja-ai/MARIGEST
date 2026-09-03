@@ -14,7 +14,7 @@ export async function login(formData: FormData) {
   }
 
   // PIN MAESTRO
-  if (pin === "2026") {
+  if (pin === "1506") {
     const token = await signToken({ email: "marijsanchezdiaz@gmail.com", role: "ADMIN" });
     
     const cookieStore = await cookies();
