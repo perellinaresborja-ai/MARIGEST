@@ -36,10 +36,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
       <Card className="w-full max-w-[320px] shadow-lg border-0 text-center">
-        <CardHeader className="space-y-2 flex flex-col items-center pt-8">
-          <img src="/marigest-logo.png" alt="MariGest Logo" className="h-16 w-auto mb-4" />
-          <CardTitle className="text-xl font-bold text-slate-800">Desbloquear</CardTitle>
-          <p className="text-sm text-slate-500">Introduce tu PIN de acceso</p>
+        <CardHeader className="space-y-2 flex flex-col items-center pt-8 pb-2">
+          <img src="/marigest-logo.png" alt="MariGest" className="w-44 h-auto object-contain mb-2" />
+          <p className="text-sm font-medium text-slate-500">Introduce tu PIN de acceso</p>
         </CardHeader>
         <CardContent className="pb-8 px-6">
           <form onSubmit={handleSubmit} className="space-y-6">

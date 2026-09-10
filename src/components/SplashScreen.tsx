@@ -1,12 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export function SplashScreen() {
+  const pathname = usePathname();
   const [show, setShow] = useState(true);
   const [fade, setFade] = useState(false);
 
   useEffect(() => {
+    // Si estamos en la página de login, no mostrar nunca el splash
+    if (pathname === "/login") {
+      setShow(false);
+      return;
+    }
+
     // Verificar si ya hemos mostrado el splash en esta sesion
     const hasSeenSplash = sessionStorage.getItem("splash_seen");
     
@@ -30,11 +38,11 @@ export function SplashScreen() {
       clearTimeout(fadeTimer);
       clearTimeout(removeTimer);
     };
-  }, []);
+  }, [pathname]);
 
   if (!show) return null;
 
-  const fadeClass = fade ? "opacity-0" : "opacity-100";
+  const fadeClass = fade ? "opacity-0 pointer-events-none" : "opacity-100";
 
   return (
     <div 
