@@ -1,4 +1,4 @@
-﻿import { getClients } from "@/app/actions/clients";
+import { getClients } from "@/app/actions/clients";
 import { getProfileCookie } from "@/app/actions/profile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,7 +8,13 @@ import Link from "next/link";
 export default async function ClientesPage() {
   const currentProfile = await getProfileCookie();
   
-  let clients = await getClients();
+  let clients: any[] = [];
+  try {
+    clients = await getClients();
+  } catch (error) {
+    console.error("Error al cargar clientes:", error);
+    clients = [];
+  }
   
   if (currentProfile === "GRANEL_PREMIUM") {
     clients = clients.filter((c: any) => c.isGranelPremium);
@@ -21,7 +27,7 @@ export default async function ClientesPage() {
       <div className="flex justify-between items-end">
         <div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900">Clientes</h1>
-          <p className="text-slate-500 mb-4">Inteligencia comercial y gestiÃ³n de cartera.</p>
+          <p className="text-slate-500 mb-4">Inteligencia comercial y gestión de cartera.</p>
         </div>
         <Link href="/clientes/nuevo">
           <Button className="bg-brand-900 hover:bg-brand-800 text-white">Nuevo Cliente</Button>
@@ -51,7 +57,7 @@ export default async function ClientesPage() {
                 clients.map((c: any) => (
                   <TableRow key={c.id}>
                     <TableCell className="font-medium">{c.commercialName}</TableCell>
-                    <TableCell>{c.type === 'HOSTELERIA' ? 'HostelerÃ­a' : c.type === 'DISTRIBUIDOR' ? 'Distribuidor' : 'Particular'}</TableCell>
+                    <TableCell>{c.type === 'HOSTELERIA' ? 'Hostelería' : c.type === 'DISTRIBUIDOR' ? 'Distribuidor' : 'Particular'}</TableCell>
                     <TableCell>
                       <div className="flex gap-1">
                         {c.isVermut && <span className="bg-brand-100 text-brand-800 text-[10px] px-1.5 py-0.5 rounded font-bold">PC</span>}
