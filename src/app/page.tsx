@@ -7,9 +7,52 @@ import { getProfileCookie } from "@/app/actions/profile";
 
 export default async function Home() {
   const profile = await getProfileCookie();
-  const data = await getDashboardData();
-  const negocio = await getNegocioDashboard("MES", undefined, undefined, profile);
-  const maxChartValue = Math.max(...data.chartData.map(d => d.total), 1000); // Para altura proporcional
+  
+  let data: any = {
+    ventasMes: 0,
+    ventasAno: 0,
+    aCobrarTotal: 0,
+    vencidoTotal: 0,
+    aPagarTotal: 0,
+    rojo: { total: 0, almacen: 0, fuera: 0 },
+    blanco: { total: 0, almacen: 0, fuera: 0 },
+    proximosCobros: [],
+    proximosPagos: [],
+    alertas: [],
+    recentOrders: [],
+    chartData: []
+  };
+
+  let negocio: any = {
+    period: "MES",
+    kpis: {
+      facturacion: 0,
+      costeProductoVendido: 0,
+      gastosTotales: 0,
+      margenEstimado: 0,
+      botellasVendidas: 0,
+      botellasPromo: 0,
+      pendienteCobro: 0
+    },
+    canales: {
+      HOSTELERIA: { facturacion: 0, botellas: 0, coste: 0, pendiente: 0 },
+      DISTRIBUIDOR: { facturacion: 0, botellas: 0, coste: 0, pendiente: 0 },
+      PARTICULAR: { facturacion: 0, botellas: 0, coste: 0, pendiente: 0 }
+    }
+  };
+
+  try {
+    const [dashboardRes, negocioRes] = await Promise.all([
+      getDashboardData().catch(e => { console.error("Error getDashboardData:", e); return null; }),
+      getNegocioDashboard("MES", undefined, undefined, profile).catch(e => { console.error("Error getNegocioDashboard:", e); return null; })
+    ]);
+    if (dashboardRes) data = dashboardRes;
+    if (negocioRes) negocio = negocioRes;
+  } catch (err) {
+    console.error("Error cargando dashboard:", err);
+  }
+
+  const maxChartValue = Math.max(...(data.chartData || []).map((d: any) => d.total), 1000);
 
   return (
     <div className="space-y-8 pb-10">
@@ -211,12 +254,18 @@ export default async function Home() {
               {data.recentOrders.map(order => (
                 <div key={order.id} className="py-3 flex justify-between items-center">
                   <div>
-                    <p className="text-sm font-medium">Venta generada - {order.client.commercialName}</p>
-                    <p className="text-xs text-slate-500">{new Date(order.date).toLocaleString()} • {order.totalBottles} botellas</p>
+                    <p className="text-sm font-medium">Venta generada - {order.client?.commercialName || "Cliente"}</p>
+                    <p className="text-xs text-slate-500">{new Date(order.date).toLocaleString()} • {order.totalBottles || 0} botellas</p>
                   </div>
-                  <Link href={`/clientes/${order.clientId}`}>
-                    <span className="text-xs font-medium text-brand-900 hover:underline">Ver</span>
-                  </Link>
+                  {order.clientId ? (
+                    <Link href={`/clientes/${order.clientId}`}>
+                      <span className="text-xs font-medium text-brand-900 hover:underline">Ver</span>
+                    </Link>
+                  ) : (
+                    <Link href={`/facturas/${order.id}`}>
+                      <span className="text-xs font-medium text-brand-900 hover:underline">Ver</span>
+                    </Link>
+                  )}
                 </div>
               ))}
             </div>

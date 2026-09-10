@@ -48,7 +48,23 @@ export async function getDashboardData() {
 
   // 4. Actividad reciente
   const recentInvoices = await prisma.invoice.findMany({ take: 5, orderBy: { date: 'desc' }, include: { order: { include: { client: true } } } });
-  const recentOrders = await Promise.all(recentInvoices.map(async inv => { let client = inv.order?.client; if (!client) { const t = await prisma.transaction.findFirst({ where: { referenceId: inv.id }, include: { client: true } }); client = t?.client; } return { id: inv.id, date: inv.date, invoiceNumber: inv.number, client, businessProfile: inv.businessProfile }; }));
+  const recentOrders = await Promise.all(recentInvoices.map(async inv => {
+    let client = inv.order?.client;
+    if (!client) {
+      const t = await prisma.transaction.findFirst({ where: { referenceId: inv.id }, include: { client: true } });
+      client = t?.client;
+    }
+    const totalBottles = inv.order ? ((inv.order.boxesRojo + inv.order.boxesBlanco) * 6 + inv.order.promoRojo + inv.order.promoBlanco) : 0;
+    return {
+      id: inv.id,
+      date: inv.date,
+      invoiceNumber: inv.number,
+      client,
+      clientId: client?.id,
+      totalBottles,
+      businessProfile: inv.businessProfile
+    };
+  }));
 
   // 5. Alertas
   const alertas = [];
