@@ -9,7 +9,30 @@ export default async function NegocioPage({ searchParams }: { searchParams: Prom
   const end = params.end;
   const profile = params.profile || "GENERAL";
   
-  const data = await getNegocioDashboard(period, start, end, profile);
+  let data: any = {
+    kpis: {
+      facturacion: 0,
+      costeProductoVendido: 0,
+      gastosTotales: 0,
+      margenEstimado: 0,
+      botellasVendidas: 0,
+      botellasPromo: 0,
+      pendienteCobro: 0
+    },
+    canales: {
+      HOSTELERIA: { facturacion: 0, botellas: 0, coste: 0, pendiente: 0 },
+      DISTRIBUIDOR: { facturacion: 0, botellas: 0, coste: 0, pendiente: 0 },
+      PARTICULAR: { facturacion: 0, botellas: 0, coste: 0, pendiente: 0 }
+    }
+  };
+
+  try {
+    const res = await getNegocioDashboard(period, start, end, profile);
+    if (res) data = res;
+  } catch (error) {
+    console.error("Error cargando negocio:", error);
+  }
+
   const { kpis, canales } = data;
 
   return (

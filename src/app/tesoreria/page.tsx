@@ -3,7 +3,21 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Link from "next/link";
 
 export default async function TesoreriaPage() {
-  const data = await getTesoreriaDashboard();
+  let data: any = {
+    aCobrarTotal: 0,
+    vencidoCobrar: 0,
+    aPagarTotal: 0,
+    vencidoPagar: 0,
+    cobrosList: [],
+    pagosList: []
+  };
+
+  try {
+    const res = await getTesoreriaDashboard();
+    if (res) data = res;
+  } catch (error) {
+    console.error("Error cargando tesoreria:", error);
+  }
 
   return (
     <div className="space-y-8">

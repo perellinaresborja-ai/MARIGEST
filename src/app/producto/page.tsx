@@ -13,11 +13,22 @@ export default async function ProductoPage() {
     return <ProductoGranel />;
   }
 
-  const stock = await getStockOverview();
+  let stock: any[] = [];
+  let movements: any[] = [];
+
+  try {
+    const [s, m] = await Promise.all([
+      getStockOverview().catch(e => { console.error("Error stock:", e); return []; }),
+      getStockMovements(20).catch(e => { console.error("Error movements:", e); return []; })
+    ]);
+    stock = s || [];
+    movements = m || [];
+  } catch (err) {
+    console.error("Error cargando producto:", err);
+  }
+
   const rojo = stock.find((s) => s.type === "ROJO");
   const blanco = stock.find((s) => s.type === "BLANCO");
-  
-  const movements = await getStockMovements(20);
 
   const getTypeLabel = (type: string) => {
     const labels: Record<string, string> = {
@@ -129,20 +140,22 @@ export default async function ProductoPage() {
                 </thead>
                 <tbody>
                   {movements.map(mov => {
-                    const isPositive = mov.stockAfter > mov.stockBefore;
+                    const isPositive = (mov.stockAfter || 0) > (mov.stockBefore || 0);
+                    const prodType = mov.product?.type;
+                    const prodName = mov.product?.name || "Producto";
                     return (
                       <tr key={mov.id} className="border-b border-slate-100 hover:bg-slate-50/50">
-                        <td className="px-4 py-3 text-slate-500">{new Date(mov.date).toLocaleString()}</td>
+                        <td className="px-4 py-3 text-slate-500">{mov.date ? new Date(mov.date).toLocaleString() : "-"}</td>
                         <td className="px-4 py-3 font-medium">{getTypeLabel(mov.type)}</td>
                         <td className="px-4 py-3">
-                          <span className={`px-2 py-1 rounded text-xs font-bold ${mov.product.type === 'ROJO' ? 'bg-brand-100 text-brand-800' : 'bg-amber-100 text-amber-800'}`}>
-                            {mov.product.name}
+                          <span className={`px-2 py-1 rounded text-xs font-bold ${prodType === 'ROJO' ? 'bg-brand-100 text-brand-800' : 'bg-amber-100 text-amber-800'}`}>
+                            {prodName}
                           </span>
                         </td>
                         <td className={`px-4 py-3 text-right font-bold ${isPositive ? 'text-emerald-600' : 'text-brand-600'}`}>
                           {isPositive ? '+' : '-'}{mov.quantity}
                         </td>
-                        <td className="px-4 py-3 text-right text-slate-500">{mov.stockAfter}</td>
+                        <td className="px-4 py-3 text-right text-slate-500">{mov.stockAfter ?? "-"}</td>
                         <td className="px-4 py-3">
                           <div className="truncate max-w-[200px]" title={mov.reason || '-'}>{mov.reason || '-'}</div>
                           <div className="text-xs text-slate-400">{mov.user}</div>
